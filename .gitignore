@@ -46,3 +46,6 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# source-of-truth CV (PII: phone number) — never commit to the public repo (§A.6)
+/docs/cv-master.pdf

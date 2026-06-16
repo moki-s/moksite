@@ -3,6 +3,27 @@
 Accepted deviations from the PRD and one-line justifications for anything that
 needs explaining (per CLAUDE.md / PRD §0.3). Newest first.
 
+## Content pass — real CV content (16 Jun 2026)
+
+Resolved the site content from the owner's final CV (Technical Product Manager;
+`docs/cv-master.pdf`, git-ignored per §A.6). §A.6 applied throughout:
+
+- **No phone number** anywhere on the site.
+- **Employer revenue is relative-framed, not exact:** Vibrant Lane → "roughly
+  10× in two months"; the Integer launch → "a launch-week pipeline of enquiries
+  and the first direct course sales" (no £ figure / enquiry counts).
+- **The candidate's own contribution metrics are verbatim** from the CV (93%
+  adoption, 20→5 min / −75%, zero data loss, 95% accuracy, 1,200 learners,
+  3 centres / 1,700+ patients, 43% cost reduction).
+- **Internal employer tools are described functionally, not named** (e.g. the
+  "Deal Generator" → "a companion tool for configurable-deposit payment links").
+- The 3 placeholder cases were replaced by the **5 real cases**; origin (PRD A.2
+  draft) and the arsenal skill names were seeded; the dossier
+  experience/skills/education were filled.
+- **Still [TODO-CONTENT]:** case covers/screenshots, the origin portrait, the
+  public `/cv.pdf` (a phone-free designed export the owner supplies), and most
+  arsenal "field-use" voice lines (the agent does not improvise copy-deck voice).
+
 ## Phase 3 — Case files
 
 - **OG fonts bundled (OFL).** `src/og-fonts/{Anton-Regular,IBMPlexMono-Regular}.ttf`

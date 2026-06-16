@@ -6,14 +6,21 @@ test("case index → detail, NEXT CASE loops, RETURN TO ISSUE", async ({ page })
   await page.goto("/");
   await page.locator("#cases").scrollIntoViewIfNeeded();
 
+  const hrefs = await page
+    .locator(".case-folder")
+    .evaluateAll((els) =>
+      els.map((e) => (e as HTMLAnchorElement).getAttribute("href") ?? ""),
+    );
+  expect(hrefs.length).toBeGreaterThanOrEqual(3);
+
   await page.locator(".case-folder").first().click();
-  await expect(page).toHaveURL(/\/case\/case-one$/);
+  await expect(page).toHaveURL(new RegExp(`${hrefs[0]}$`));
   await expect(page.locator("h1.case-title-lg")).toBeVisible();
 
-  // NEXT CASE loops through all three and back to the first
-  for (const slug of ["case-two", "case-three", "case-one"]) {
+  // NEXT CASE cycles through every case and loops back to the first
+  for (let i = 0; i < hrefs.length; i++) {
     await page.getByRole("link", { name: "NEXT CASE →" }).click();
-    await expect(page).toHaveURL(new RegExp(`/case/${slug}$`));
+    await expect(page).toHaveURL(new RegExp(`${hrefs[(i + 1) % hrefs.length]}$`));
   }
 
   await page.getByRole("link", { name: "RETURN TO ISSUE" }).click();
@@ -22,7 +29,7 @@ test("case index → detail, NEXT CASE loops, RETURN TO ISSUE", async ({ page })
 });
 
 test("case detail OG meta + image render (1200x630 PNG)", async ({ page, request }) => {
-  await page.goto("/case/case-one");
+  await page.goto("/case/the-learning-machine");
 
   const ogImage = await page
     .locator('meta[property="og:image"]')
@@ -53,7 +60,7 @@ test("no console errors on a case page", async ({ page }) => {
     if (m.type() === "error") errors.push(m.text());
   });
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto("/case/case-two");
+  await page.goto("/case/the-dictation-job");
   await page.waitForTimeout(600);
   expect(errors, errors.join("\n")).toEqual([]);
 });

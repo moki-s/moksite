@@ -1,9 +1,8 @@
-// §6.2 — typed site content.
-// Personal identifiers are seeded from PRD Appendix A.1 (resolved from the
-// master CV — see §6.3, marked resolved, and docs/DECISIONS.md). Everything
-// else (origin copy, arsenal field-use lines, testimonials) stays
-// [TODO-CONTENT] until the owner approves it. The phone number is deliberately
-// absent everywhere (PRD A.6).
+// §6.2 — typed site content. Personal facts resolved from the CV
+// (docs/cv-master.pdf), applying §A.6: no phone number anywhere; employer
+// revenue uses relative framings (not exact figures); the candidate's own
+// contribution metrics are verbatim. Remaining [TODO-CONTENT] = arsenal
+// "field-use" voice lines the owner approves/writes (PRD A.4).
 
 export const siteConfig = {
   name: "Mokshith Sanga",
@@ -21,17 +20,63 @@ export type ArsenalGroup = {
   items: { name: string; icon: string; fieldUse: string }[];
 };
 
-// Arsenal: skill names are factual but the noir "field-use" one-liners are
-// drafts (PRD A.4) awaiting approval — left empty/[TODO-CONTENT] for now.
+// Skill names are factual (from the CV). The noir "field-use" one-liners are
+// drafts (PRD A.4) — seeded where drafted, [TODO-CONTENT] where the owner writes
+// the voice (the agent does not improvise copy-deck voice).
 export const arsenal: ArsenalGroup[] = [
-  { group: "LANGUAGES", items: [{ name: "[TODO-CONTENT]", icon: "Code", fieldUse: "[TODO-CONTENT]" }] },
-  { group: "FRAMEWORKS", items: [{ name: "[TODO-CONTENT]", icon: "Boxes", fieldUse: "[TODO-CONTENT]" }] },
-  { group: "INFRA", items: [{ name: "[TODO-CONTENT]", icon: "Server", fieldUse: "[TODO-CONTENT]" }] },
-  { group: "TOOLS", items: [{ name: "[TODO-CONTENT]", icon: "Wrench", fieldUse: "[TODO-CONTENT]" }] },
+  {
+    group: "LANGUAGES",
+    items: [
+      { name: "Python", icon: "Code", fieldUse: "[TODO-CONTENT]" },
+      { name: "SQL", icon: "Code", fieldUse: "SQL — gets confessions out of databases." },
+      { name: "JavaScript", icon: "Code", fieldUse: "[TODO-CONTENT]" },
+      { name: "PHP", icon: "Code", fieldUse: "[TODO-CONTENT]" },
+      { name: "HTML / CSS", icon: "Code", fieldUse: "[TODO-CONTENT]" },
+    ],
+  },
+  {
+    group: "AI & AUTOMATION",
+    items: [
+      { name: "Claude Code", icon: "Bot", fieldUse: "Claude Code — the partner who works the night shift." },
+      { name: "AI agents", icon: "Bot", fieldUse: "[TODO-CONTENT]" },
+      { name: "Model Context Protocol", icon: "Bot", fieldUse: "MCP — wires the informants together." },
+      { name: "Agent Skills", icon: "Bot", fieldUse: "[TODO-CONTENT]" },
+      { name: "Prompt engineering", icon: "Bot", fieldUse: "[TODO-CONTENT]" },
+      { name: "LLM integration", icon: "Bot", fieldUse: "[TODO-CONTENT]" },
+    ],
+  },
+  {
+    group: "DATA",
+    items: [
+      { name: "MongoDB & Charts", icon: "Database", fieldUse: "[TODO-CONTENT]" },
+      { name: "Supabase (Postgres)", icon: "Database", fieldUse: "[TODO-CONTENT]" },
+      { name: "MySQL", icon: "Database", fieldUse: "[TODO-CONTENT]" },
+      { name: "Excel", icon: "Database", fieldUse: "Excel — old weapon. still loaded." },
+    ],
+  },
+  {
+    group: "DELIVERY & INTEGRATIONS",
+    items: [
+      { name: "Agile / Scrum", icon: "Workflow", fieldUse: "[TODO-CONTENT]" },
+      { name: "JIRA", icon: "Workflow", fieldUse: "[TODO-CONTENT]" },
+      { name: "Postman", icon: "Workflow", fieldUse: "[TODO-CONTENT]" },
+      { name: "Sentry", icon: "Workflow", fieldUse: "[TODO-CONTENT]" },
+      { name: "Stripe", icon: "Workflow", fieldUse: "Stripe — the money always leaves a trail." },
+      { name: "Twilio", icon: "Workflow", fieldUse: "[TODO-CONTENT]" },
+      { name: "Resend", icon: "Workflow", fieldUse: "[TODO-CONTENT]" },
+      { name: "Zoho", icon: "Workflow", fieldUse: "[TODO-CONTENT]" },
+      { name: "Figma", icon: "Workflow", fieldUse: "[TODO-CONTENT]" },
+    ],
+  },
 ];
 
-// Origin copy is a DRAFT needing the owner's edit/approval (PRD A.2) — 2–3 blocks.
-export const origin: string[] = ["[TODO-CONTENT]", "[TODO-CONTENT]", "[TODO-CONTENT]"];
+// Origin copy resolved from PRD A.2 (owner may edit). Employer revenue is
+// relative-framed per §A.6.
+export const origin: string[] = [
+  "The city runs on broken spreadsheets and slow software. I fix that.",
+  "By day: product manager — roadmaps, PRDs, stakeholders. After hours I ship the thing myself, AI agents at my side. An LMS for 1,200 learners. A clinician tool at 93% adoption. A store scaled roughly tenfold in two months.",
+  "Founding-team years in health-tech and EdTech taught me the rule: everything ships with your name on it. Currently finishing an MSc in Advanced Computer Science in Birmingham. The signal's on — I take cases.",
+];
 
 export type Testimonial = { quote: string; name: string; role: string };
 
