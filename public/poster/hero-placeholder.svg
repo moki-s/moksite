@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="A rain-soaked noir city skyline at night, one window lit amber.">
+  <defs>
+    <radialGradient id="searchlight" cx="70%" cy="14%" r="58%">
+      <stop offset="0%" stop-color="#F5A623" stop-opacity="0.28"/>
+      <stop offset="42%" stop-color="#F5A623" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#F5A623" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="fog" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0B0E13" stop-opacity="0"/>
+      <stop offset="72%" stop-color="#0B0E13" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#141B2D" stop-opacity="0.85"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="#0B0E13"/>
+  <rect width="1600" height="900" fill="url(#searchlight)"/>
+
+  <!-- back row -->
+  <g fill="#141B2D" opacity="0.55">
+    <rect x="40" y="440" width="150" height="460"/>
+    <rect x="220" y="380" width="120" height="520"/>
+    <rect x="380" y="470" width="170" height="430"/>
+    <rect x="600" y="410" width="130" height="490"/>
+    <rect x="780" y="360" width="150" height="540"/>
+    <rect x="980" y="450" width="160" height="450"/>
+    <rect x="1180" y="400" width="140" height="500"/>
+    <rect x="1360" y="470" width="200" height="430"/>
+  </g>
+
+  <!-- mid row -->
+  <g fill="#141B2D">
+    <rect x="120" y="540" width="180" height="360"/>
+    <rect x="330" y="500" width="150" height="400"/>
+    <rect x="520" y="560" width="200" height="340"/>
+    <rect x="760" y="500" width="160" height="400"/>
+    <rect x="960" y="540" width="190" height="360"/>
+    <rect x="1190" y="510" width="170" height="390"/>
+    <rect x="1400" y="560" width="180" height="340"/>
+  </g>
+
+  <!-- front row (darkest, closest) -->
+  <g fill="#0B0E13">
+    <rect x="0" y="640" width="260" height="260"/>
+    <rect x="300" y="600" width="220" height="300"/>
+    <rect x="560" y="660" width="240" height="240"/>
+    <rect x="840" y="610" width="210" height="290"/>
+    <rect x="1090" y="650" width="250" height="250"/>
+    <rect x="1380" y="620" width="220" height="280"/>
+  </g>
+
+  <!-- amber lit windows (sparse) -->
+  <g fill="#F5A623">
+    <rect x="250" y="430" width="8" height="12" opacity="0.85"/>
+    <rect x="270" y="470" width="8" height="12" opacity="0.5"/>
+    <rect x="820" y="410" width="9" height="13" opacity="0.9"/>
+    <rect x="845" y="450" width="9" height="13" opacity="0.45"/>
+    <rect x="1015" y="500" width="8" height="12" opacity="0.6"/>
+    <rect x="600" y="600" width="8" height="12" opacity="0.55"/>
+    <rect x="1230" y="560" width="8" height="12" opacity="0.5"/>
+  </g>
+
+  <!-- the one lit window (hero hotspot — Phase 4 makes it interactive) -->
+  <rect x="905" y="560" width="16" height="22" fill="#F5A623" opacity="0.95"/>
+
+  <rect width="1600" height="900" fill="url(#fog)"/>
+</svg>

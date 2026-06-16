@@ -15,7 +15,7 @@ export default function DossierPage() {
   const cases = getAllCases();
 
   return (
-    <main className="dossier mx-auto max-w-3xl px-6 py-16">
+    <main id="main-content" tabIndex={-1} className="dossier mx-auto max-w-3xl px-6 py-16">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd()) }}

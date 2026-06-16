@@ -24,11 +24,14 @@ export type ArsenalGroup = {
 // Arsenal: skill names are factual but the noir "field-use" one-liners are
 // drafts (PRD A.4) awaiting approval — left empty/[TODO-CONTENT] for now.
 export const arsenal: ArsenalGroup[] = [
-  // [TODO-CONTENT] — seed groups + field-use lines from PRD Appendix A.4 after approval.
+  { group: "LANGUAGES", items: [{ name: "[TODO-CONTENT]", icon: "Code", fieldUse: "[TODO-CONTENT]" }] },
+  { group: "FRAMEWORKS", items: [{ name: "[TODO-CONTENT]", icon: "Boxes", fieldUse: "[TODO-CONTENT]" }] },
+  { group: "INFRA", items: [{ name: "[TODO-CONTENT]", icon: "Server", fieldUse: "[TODO-CONTENT]" }] },
+  { group: "TOOLS", items: [{ name: "[TODO-CONTENT]", icon: "Wrench", fieldUse: "[TODO-CONTENT]" }] },
 ];
 
-// Origin copy is a DRAFT needing the owner's edit/approval (PRD A.2).
-export const origin: string[] = ["[TODO-CONTENT]"];
+// Origin copy is a DRAFT needing the owner's edit/approval (PRD A.2) — 2–3 blocks.
+export const origin: string[] = ["[TODO-CONTENT]", "[TODO-CONTENT]", "[TODO-CONTENT]"];
 
 export type Testimonial = { quote: string; name: string; role: string };
 

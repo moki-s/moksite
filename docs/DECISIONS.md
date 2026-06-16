@@ -3,6 +3,31 @@
 Accepted deviations from the PRD and one-line justifications for anything that
 needs explaining (per CLAUDE.md / PRD §0.3). Newest first.
 
+## Phase 2 — Comic shell & scroll engine
+
+- **Transition devices are not scroll-pinned (owner-approved).** §5.2 allows brief
+  panel pinning, but pinning is the documented Safari/anchor-bug risk and directly
+  threatens two acceptance criteria (deep-links land + zero console errors). The
+  three devices are implemented as scroll-/enter-driven overlays instead: gutter
+  wipe (Origin, Signal), halftone dissolve (Arsenal), speed-line zoom (Cases
+  preview). Speed-line's real trigger — entering a case — is wired in Phase 3.
+
+- **Panel reveal is visible-by-default.** Content renders visible in SSR HTML;
+  GSAP only hides+reveals it when motion is enabled (works with JS off and under
+  reduced motion). One `gsap.context` per panel, reverted on cleanup/toggle.
+
+- **New component dirs `sections/` and (implicit) reveal logic.** §7.3 lists
+  `hero/`, `cases/`, `contact/`, `panels/`, `ui/`, `terminal/`; the page sections
+  (Origin/CaseFiles/Arsenal/Signal) live in a new `src/components/sections/` dir.
+
+- **Placeholder content stays in `site.ts` / cases, not in components**, so the
+  CONTENT-TODO generator keeps tracking it (origin = 3× [TODO-CONTENT]; arsenal =
+  4 groups × [TODO-CONTENT] item). Hero poster is an original noir SVG
+  (`public/poster/hero-placeholder.svg`); the real AVIF poster + R3F scene = Phase 4.
+
+- **Deps added (all §7.2):** `gsap`, `lenis`, `zustand`, `lucide-react`, dev
+  `@playwright/test`.
+
 ## Phase 1 — Content backbone
 
 - **siteConfig seeded from Appendix A.1 (owner-approved, 16 Jun 2026).** Personal

@@ -1,34 +1,29 @@
-// Phase 0 hello-world — temporary noir placeholder. Replaced by the real
-// scroll story in Phase 2. No personal facts in the visible copy.
 import type { Metadata } from "next";
 import { absoluteUrl, personJsonLd } from "@/lib/seo";
+import { HeroPoster } from "@/components/hero/HeroPoster";
+import { Origin } from "@/components/sections/Origin";
+import { CaseFiles } from "@/components/sections/CaseFiles";
+import { Arsenal } from "@/components/sections/Arsenal";
+import { Signal } from "@/components/sections/Signal";
 
 export const metadata: Metadata = {
   alternates: { canonical: absoluteUrl("/") },
 };
 
+// Issue #01 — the main scroll story (Panels 0–5). Hero is a static placeholder
+// poster in Phase 2; the R3F cold open arrives in Phase 4.
 export default function Home() {
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-ink px-6 text-center text-bone">
+    <main id="main-content" tabIndex={-1}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd()) }}
       />
-      <p className="font-mono text-caption uppercase tracking-[0.12em] text-rain">
-        moksite os v1.0 — issue #01
-      </p>
-      <h1 className="font-display text-display uppercase leading-none tracking-[-0.01em]">
-        moksite
-      </h1>
-      <p className="font-mono text-meta uppercase tracking-[0.12em] text-signal">
-        phase 0 — foundations
-      </p>
-      <a
-        href="/dev/tokens"
-        className="font-mono text-meta uppercase tracking-[0.12em] underline decoration-signal decoration-2 underline-offset-4 transition-colors hover:text-signal"
-      >
-        view design tokens →
-      </a>
+      <HeroPoster />
+      <Origin />
+      <CaseFiles />
+      <Arsenal />
+      <Signal />
     </main>
   );
 }

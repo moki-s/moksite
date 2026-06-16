@@ -3,6 +3,10 @@ import { Anton, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import "../styles/globals.css";
 import { siteConfig } from "@/content/site";
 import { getBaseUrl } from "@/lib/seo";
+import { MotionProvider } from "@/components/MotionProvider";
+import { Grain } from "@/components/ui/Grain";
+import { NavBar } from "@/components/ui/NavBar";
+import { Footer } from "@/components/ui/Footer";
 
 // §4.2 — three self-hosted families via next/font/google.
 const anton = Anton({
@@ -46,7 +50,17 @@ export default function RootLayout({
       lang="en"
       className={`${anton.variable} ${plexSans.variable} ${plexMono.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <a href="#main-content" className="skip-link">
+          Skip to content
+        </a>
+        <MotionProvider>
+          <Grain />
+          <NavBar />
+          {children}
+          <Footer />
+        </MotionProvider>
+      </body>
     </html>
   );
 }
