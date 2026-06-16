@@ -95,3 +95,27 @@
     }
   }
 }
+
+/* §5.8 — /dossier print stylesheet: black on white, no screen-only chrome,
+   link URLs revealed. The .no-print utility hides screen-only actions. */
+@media print {
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .dossier,
+  .dossier * {
+    color: #000 !important;
+    background: transparent !important;
+  }
+
+  .dossier a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+  }
+}

@@ -3,6 +3,32 @@
 Accepted deviations from the PRD and one-line justifications for anything that
 needs explaining (per CLAUDE.md / PRD §0.3). Newest first.
 
+## Phase 1 — Content backbone
+
+- **siteConfig seeded from Appendix A.1 (owner-approved, 16 Jun 2026).** Personal
+  identifiers (name, role, strapline, email, GitHub, LinkedIn) are seeded from the
+  PRD's resolved Appendix A.1 / §6.3, since JSON-LD `Person` and SEO metadata
+  require a real name + valid social URLs. This copies facts already in the
+  committed PRD — not fabrication. All other content (case metrics/copy, origin,
+  arsenal field-use lines, dossier body, cv.pdf) stays `[TODO-CONTENT]`.
+
+- **Zod 4 url validator.** `caseSchema` uses top-level `z.url()` (Zod 4) in place
+  of the deprecated `z.string().url()` from the §6.1 snippet — identical
+  validation, current API (verified via Context7).
+
+- **Image-existence check skips placeholders.** `cover`/`images[].src` values that
+  are empty or contain `[TODO-CONTENT]` are not existence-checked (the CONTENT-TODO
+  generator tracks them). Concrete-but-missing image paths still fail the build, as
+  §6.1 requires.
+
+- **CONTENT-TODO generator scope.** Scans only `content/`, `src/content/`, and
+  `src/app/`, so the marker-handling code in `src/lib`, the generator script, and
+  the literal marker inside `docs/` are not falsely listed.
+
+- **Per-case `CreativeWork` JSON-LD deferred to Phase 3.** Phase 1 ships the
+  `Person` JSON-LD on `/` and `/dossier`; per-case `CreativeWork` (§10) lands with
+  the case-detail pages in Phase 3.
+
 ## Phase 0 — Foundations
 
 - **Deployment deferred to the end of the project (owner direction, 16 Jun 2026).**

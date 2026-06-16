@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Anton, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import "../styles/globals.css";
+import { siteConfig } from "@/content/site";
+import { getBaseUrl } from "@/lib/seo";
 
 // §4.2 — three self-hosted families via next/font/google.
 const anton = Anton({
@@ -27,12 +29,13 @@ const plexMono = IBM_Plex_Mono({
   preload: false,
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-
 export const metadata: Metadata = {
-  title: "moksite",
-  description: "Issue #01 — a noir case file. Under construction.",
-  ...(siteUrl ? { metadataBase: new URL(siteUrl) } : {}),
+  metadataBase: new URL(getBaseUrl()),
+  title: {
+    default: `${siteConfig.name} — ${siteConfig.role}`,
+    template: `%s — ${siteConfig.name}`,
+  },
+  description: `The portfolio of ${siteConfig.name}, ${siteConfig.role}.`,
 };
 
 export default function RootLayout({

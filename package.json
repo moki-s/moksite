@@ -9,27 +9,35 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "prebuild": "node scripts/generate-content-todo.mjs",
+    "content:todo": "node scripts/generate-content-todo.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "gray-matter": "^4.0.3",
+    "next": "15.5.19",
+    "next-mdx-remote": "^6.0.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.5.19"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "15.5.19",
-    "@eslint/eslintrc": "^3",
-    "prettier": "^3"
+    "prettier": "^3",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["sharp", "unrs-resolver"]
+    "onlyBuiltDependencies": [
+      "sharp",
+      "unrs-resolver"
+    ]
   }
 }
