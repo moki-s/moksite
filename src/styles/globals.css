@@ -596,3 +596,262 @@ html.no-motion .hero-caption {
   color: var(--signal);
   border-color: var(--signal);
 }
+
+/* ==========================================================================
+   Phase 3 — case files
+   ========================================================================== */
+
+/* §5.4 — manila-folder index interaction */
+.case-folder {
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+.case-folder:hover,
+.case-folder:focus-visible {
+  transform: translateY(-4px);
+}
+.case-folder-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.case-stamp {
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+.case-folder:hover .case-stamp,
+.case-folder:focus-visible .case-stamp {
+  transform: rotate(-1deg);
+  opacity: 0.25;
+}
+.case-summary {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.2s ease,
+    opacity 0.2s ease;
+}
+.case-folder:hover .case-summary,
+.case-folder:focus-visible .case-summary {
+  max-height: 4rem;
+  opacity: 1;
+}
+
+/* §5.2 — speed-line zoom overlay (case entry) */
+.speedline-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  background: repeating-conic-gradient(
+    from 0deg at 50% 50%,
+    transparent 0deg 2.6deg,
+    color-mix(in srgb, var(--bone) 28%, transparent) 2.6deg 3deg
+  );
+}
+
+/* §5.4 — case detail */
+.case-detail {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 7rem 1.5rem 5rem;
+}
+@media (min-width: 768px) {
+  .case-detail {
+    padding: 8rem 3rem 6rem;
+  }
+}
+.case-splash {
+  margin-bottom: 3rem;
+}
+.case-cover {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  border: 5px solid var(--bone);
+  background: var(--midnight);
+  overflow: hidden;
+}
+.case-cover-img {
+  object-fit: cover;
+}
+.case-cover-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-caption);
+  letter-spacing: 0.12em;
+  color: var(--rain);
+}
+.case-splash-meta {
+  margin-bottom: 0.75rem;
+}
+.case-title-lg {
+  font-family: var(--font-anton), sans-serif;
+  font-size: var(--text-display);
+  line-height: 0.95;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: var(--bone);
+}
+.case-stack {
+  margin-top: 0.75rem;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--rain);
+}
+
+/* MDX prose — THE BRIEF / THE OPERATION */
+.case-prose {
+  max-width: 68ch;
+  margin: 0 0 3rem;
+}
+.case-prose h2 {
+  margin: 2.5rem 0 0.75rem;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--signal);
+}
+.case-prose p {
+  margin-bottom: 1rem;
+  font-family: var(--font-plex-sans), sans-serif;
+  font-size: var(--text-body-lg);
+  line-height: 1.6;
+  color: var(--bone);
+}
+
+/* screenshots */
+.case-screens {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+@media (min-width: 768px) {
+  .case-screens {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.case-screen {
+  margin: 0;
+}
+.case-screen-frame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 16 / 10;
+  border: 5px solid var(--bone);
+  background: var(--midnight);
+  overflow: hidden;
+}
+.case-screen-img {
+  object-fit: cover;
+}
+.case-screen-label {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-caption);
+  letter-spacing: 0.12em;
+  color: var(--rain);
+}
+.case-screen figcaption {
+  margin-top: 0.5rem;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-caption);
+  color: var(--rain);
+}
+
+/* outcome / evidence */
+.case-section-title {
+  margin-bottom: 1.25rem;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--signal);
+}
+.case-outcome,
+.case-evidence-section {
+  margin-bottom: 3rem;
+}
+.case-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+}
+.case-metric-value {
+  font-family: var(--font-anton), sans-serif;
+  font-size: var(--text-h1);
+  line-height: 1;
+  color: var(--bone);
+}
+.case-metric-label {
+  margin-top: 0.25rem;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--rain);
+}
+.case-nda {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--blood);
+}
+.case-evidence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.case-evidence-btn {
+  padding: 0.6rem 1.25rem;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink);
+  background: var(--signal);
+  text-decoration: none;
+}
+
+/* footer nav */
+.case-footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: space-between;
+  padding-top: 2rem;
+  border-top: 1px solid color-mix(in srgb, var(--rain) 30%, transparent);
+}
+.case-next,
+.case-return {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+}
+.case-next {
+  color: var(--signal);
+}
+.case-return {
+  color: var(--rain);
+}
+.case-next:hover,
+.case-return:hover {
+  color: var(--bone);
+}

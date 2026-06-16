@@ -9,14 +9,14 @@ const TODO_MARKER = "[TODO-CONTENT]";
 
 export type CaseEntry = CaseFrontmatter & { body: string };
 
-/** Placeholder values aren't real paths — skip existence checks for them; the
- *  CONTENT-TODO generator tracks unresolved markers instead. */
-function isUnresolved(value: string): boolean {
+/** A field still holding a placeholder (empty or a [TODO-CONTENT] marker). Used
+ *  to skip image existence checks and to render placeholder frames in the UI. */
+export function isPlaceholder(value: string): boolean {
   return value.trim() === "" || value.includes(TODO_MARKER);
 }
 
 function assertImageExists(imagePath: string, slug: string, field: string): void {
-  if (isUnresolved(imagePath)) return;
+  if (isPlaceholder(imagePath)) return;
   const relative = imagePath.replace(/^\/+/, "");
   const absolute = path.join(PUBLIC_DIR, relative);
   if (!fs.existsSync(absolute)) {
@@ -74,6 +74,24 @@ export function getAllCases(): CaseEntry[] {
   }
 
   return cases.sort((a, b) => a.order - b.order);
+}
+
+/** Frontmatter-only lookup (no MDX compile) — for OG images, generateMetadata,
+ *  and the splash/outcome/evidence sections. */
+export function getCaseFrontmatter(slug: string): CaseEntry | null {
+  if (!/^[a-z0-9-]+$/.test(slug)) return null;
+  const fileName = `${slug}.mdx`;
+  if (!fs.existsSync(path.join(CASES_DIR, fileName))) return null;
+  return parseCaseFile(fileName);
+}
+
+/** The adjacent case by display order, looping. dir = 1 → next, -1 → previous. */
+export function getAdjacentCase(slug: string, dir: 1 | -1 = 1): CaseEntry | null {
+  const all = getAllCases();
+  if (all.length === 0) return null;
+  const index = all.findIndex((entry) => entry.slug === slug);
+  if (index === -1) return null;
+  return all[(index + dir + all.length) % all.length];
 }
 
 /** A single case with its MDX body compiled to a React node (for the Phase 3

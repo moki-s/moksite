@@ -3,6 +3,25 @@
 Accepted deviations from the PRD and one-line justifications for anything that
 needs explaining (per CLAUDE.md / PRD §0.3). Newest first.
 
+## Phase 3 — Case files
+
+- **OG fonts bundled (OFL).** `src/og-fonts/{Anton-Regular,IBMPlexMono-Regular}.ttf`
+  are committed and read via `fs.readFile(process.cwd()/…)` in the next/og routes
+  (no build-time network). Both are Open Font License — embedding is permitted.
+
+- **Speed-line zoom = case entry.** Moved from the Phase-2 Cases-panel-enter
+  preview to the folder click (`CaseIndex` overlay). Motion off / no-JS → the
+  `<Link>` navigates directly; the Cases panel entrance is now a plain reveal.
+
+- **Per-case `CreativeWork` JSON-LD** added on `/case/[slug]` (the §10 item
+  deferred from Phase 1). A **default OG card** is added at
+  `src/app/opengraph-image.tsx` (§10).
+
+- **Placeholder covers/screenshots render placeholder frames** in fixed
+  aspect-ratio boxes (CLS-safe); real images use `next/image` once supplied.
+  `isPlaceholder()` is exported from `content.ts` so no literal `[TODO-CONTENT]`
+  string appears in scanned `src/app` source.
+
 ## Phase 2 — Comic shell & scroll engine
 
 - **Transition devices are not scroll-pinned (owner-approved).** §5.2 allows brief
