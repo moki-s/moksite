@@ -40,4 +40,7 @@ jobs:
         run: pnpm test:e2e
 
       - name: Lighthouse CI — §2 thresholds (perf ≥85 mobile, a11y ≥95, SEO 100)
-        run: pnpm exec lhci autorun --config=./lighthouserc.json
+        run: |
+          pnpm start &
+          for i in $(seq 1 30); do curl -sf http://localhost:3000 >/dev/null 2>&1 && break; sleep 1; done
+          pnpm exec lhci autorun --config=./lighthouserc.json --collect.startServerCommand=""
