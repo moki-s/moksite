@@ -6,8 +6,8 @@ on:
   pull_request:
 
 jobs:
-  build:
-    name: typecheck · lint · build
+  verify:
+    name: typecheck · lint · build · e2e · lighthouse
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,3 +32,12 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium webkit
+
+      - name: E2E — Playwright (chromium + webkit) + axe (§9, §12)
+        run: pnpm test:e2e
+
+      - name: Lighthouse CI — §2 thresholds (perf ≥85 mobile, a11y ≥95, SEO 100)
+        run: pnpm exec lhci autorun --config=./lighthouserc.json

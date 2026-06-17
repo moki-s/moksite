@@ -48,6 +48,8 @@
   --bone: var(--color-bone);
   --signal: var(--color-signal);
   --blood: var(--color-blood);
+  /* AA-on-ink red for small text (≥4.5:1); --blood stays for fills/borders */
+  --blood-bright: #e35345;
 
   /* §4.3 z-index scale (for hand-written CSS / GSAP layers) */
   --z-content: 0;
@@ -577,7 +579,7 @@ html.no-motion .hero-caption {
 .footer-psst {
   font-family: var(--font-plex-mono), monospace;
   font-size: var(--text-caption);
-  color: color-mix(in srgb, var(--rain) 70%, transparent);
+  color: color-mix(in srgb, var(--rain) 90%, transparent);
 }
 .motion-toggle {
   padding: 0.4rem 0.8rem;
@@ -808,7 +810,7 @@ html.no-motion .hero-caption {
   font-size: var(--text-meta);
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--blood);
+  color: var(--blood-bright);
 }
 .case-evidence {
   display: flex;
@@ -1079,7 +1081,7 @@ html.no-motion .terminal-overlay {
   color: var(--signal);
 }
 .tone-blood {
-  color: var(--blood);
+  color: var(--blood-bright);
 }
 .tone-default {
   color: var(--signal);
@@ -1153,6 +1155,7 @@ html.high-contrast {
   --color-rain: #c8c8c8;
   --color-signal: #ffd24a;
   --color-blood: #ff5a4d;
+  --blood-bright: #ff5a4d;
 }
 html.high-contrast *,
 html.high-contrast *::before,
@@ -1273,7 +1276,7 @@ html.high-contrast *::after {
 .signal-error {
   font-family: var(--font-plex-mono), monospace;
   font-size: var(--text-caption);
-  color: var(--blood);
+  color: var(--blood-bright);
 }
 .signal-submit {
   align-self: flex-start;
@@ -1301,7 +1304,7 @@ html.high-contrast *::after {
   color: var(--signal);
 }
 .signal-lost {
-  color: var(--blood);
+  color: var(--blood-bright);
 }
 .signal-lost a {
   color: var(--signal);

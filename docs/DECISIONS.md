@@ -3,6 +3,39 @@
 Accepted deviations from the PRD and one-line justifications for anything that
 needs explaining (per CLAUDE.md / PRD §0.3). Newest first.
 
+## Phase 7 — Hardening & launch
+
+- **3D cold-open gated to desktop-class devices.** Phones, tablets, touch and
+  low-power devices, and viewports < 1024 px now keep the poster (the LCP element
+  and the §16 fallback). A continuously-animating WebGL hero saturates a
+  CPU-throttled mobile main thread: measured mobile **TBT 4.8 s → 90 ms** and
+  **perf 0.48 → 0.94** after gating. The 3D remains the desktop experience
+  (gate: motion on · ≥4 GB · ≥4 cores · `pointer: fine` · ≥1024 px · WebGL2).
+  (§5.1, §16, §2)
+- **Final CSP shipped** (`next.config.ts`): `default-src 'self'`; `img-src 'self'
+  data:`; `font-src 'self'`; `connect-src 'self'`; `object-src/frame-ancestors
+  'none'`; `base-uri/form-action 'self'`. A statically-rendered site can't mint
+  per-request nonces, so `script-src`/`style-src` use `'unsafe-inline'` —
+  accepted trade-off. Plausible's origin is appended only when
+  `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` is set. (§7.6)
+- **Chanel pass — removed the 3D planar reflection** (one effect cut for noir
+  restraint + a small perf win). (§14)
+- **Hero `<h1>` entrance is scale-only (no opacity gate)** so the LCP text paints
+  at first paint instead of waiting for the JS-driven fade.
+- **Blood-as-text now uses `--blood-bright` (#e35345, ≥4.5:1 on ink)** for
+  `case-nda`, terminal error tone, and form errors; `--blood` stays for
+  fills/borders. The footer "psst" hint moved to rain @ 90%. Fixes the only axe
+  color-contrast violations; the suite is now zero critical/serious. (§9)
+- **`/dev/tokens` removed.** (§14)
+- **CI gates locked & blocking** (`ci.yml`): Playwright **chromium + webkit** +
+  `@axe-core/playwright` (zero critical/serious) + **Lighthouse CI** asserting §2
+  (perf ≥ 0.85 mobile, a11y ≥ 0.95, SEO = 1.0; LCP ≤ 2.5 s as a *warn*). New dev
+  deps `@axe-core/playwright`, `@lhci/cli` recorded per §0.3. (§12)
+- **LCP note:** the local `simulate`-throttled lab LCP is 2.7–3.0 s (the model is
+  deliberately pessimistic; perf *score* is 0.93–0.97). §2's "LCP ≤ 2.5 s on
+  mid-range mobile" is to be confirmed on the **production URL** (real device +
+  CDN) per the launch checklist, not on localhost.
+
 ## Phase 6 — Contact & instrumentation
 
 - **Real email end-to-end is deferred** until the owner sets `RESEND_API_KEY` +

@@ -38,7 +38,7 @@ test("keyboard-only: commands, history, tab-complete, clear", async ({ page }) =
   await page.goto("/");
   await page.keyboard.press("`");
   await expect(page.locator(DIALOG)).toBeVisible();
-  await page.waitForTimeout(1300); // boot ≤ 1.5 s
+  await expect(page.locator("#terminal-input")).toBeVisible(); // boot done (input renders on `booted`)
 
   const input = page.locator("#terminal-input");
   await expect(input).toBeFocused();
@@ -77,6 +77,23 @@ test("keyboard-only: commands, history, tab-complete, clear", async ({ page }) =
   await expect(page.locator(".terminal-log")).not.toContainText("fuel acquired");
 });
 
+test("cases + open <slug> navigates to the case file (§12)", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await page.keyboard.press("`");
+  await expect(page.locator(DIALOG)).toBeVisible();
+  await expect(page.locator("#terminal-input")).toBeVisible(); // boot done (input renders on `booted`)
+
+  const input = page.locator("#terminal-input");
+  await input.fill("cases");
+  await input.press("Enter");
+  await expect(page.locator(".terminal-log")).toContainText("open <id|slug>");
+
+  await input.fill("open the-learning-machine");
+  await input.press("Enter");
+  await expect(page).toHaveURL(/\/case\/the-learning-machine$/);
+});
+
 test("Esc always closes and restores focus to the trigger", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
@@ -86,7 +103,7 @@ test("Esc always closes and restores focus to the trigger", async ({ page }) => 
   await hotspot.focus();
   await page.keyboard.press("Enter"); // keyboard-activate → opens terminal
   await expect(page.locator(DIALOG)).toBeVisible();
-  await page.waitForTimeout(1300);
+  await expect(page.locator("#terminal-input")).toBeVisible(); // boot done (input renders on `booted`)
 
   await page.locator("#terminal-input").press("Escape");
   await expect(page.locator(DIALOG)).toHaveCount(0);

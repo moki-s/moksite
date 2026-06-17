@@ -48,7 +48,6 @@ type Building = { pos: [number, number, number]; scale: [number, number, number]
 
 function City({ texture }: { texture: THREE.Texture }) {
   const cityRef = useRef<THREE.InstancedMesh>(null);
-  const reflectRef = useRef<THREE.InstancedMesh>(null);
 
   const buildings = useMemo<Building[]>(() => {
     const rng = mulberry32(20260616);
@@ -73,7 +72,6 @@ function City({ texture }: { texture: THREE.Texture }) {
 
   useEffect(() => {
     const city = cityRef.current;
-    const reflect = reflectRef.current;
     if (!city) return;
     const dummy = new THREE.Object3D();
     buildings.forEach((b, i) => {
@@ -81,26 +79,17 @@ function City({ texture }: { texture: THREE.Texture }) {
       dummy.scale.set(...b.scale);
       dummy.updateMatrix();
       city.setMatrixAt(i, dummy.matrix);
-      if (reflect) {
-        dummy.position.set(b.pos[0], -b.pos[1], b.pos[2]);
-        dummy.updateMatrix();
-        reflect.setMatrixAt(i, dummy.matrix);
-      }
     });
     city.instanceMatrix.needsUpdate = true;
-    if (reflect) reflect.instanceMatrix.needsUpdate = true;
   }, [buildings]);
 
   return (
     <group>
+      {/* Chanel pass (§14): the cheap planar reflection was removed — noir
+          restraint + a small mobile-perf win. */}
       <instancedMesh ref={cityRef} args={[undefined, undefined, buildings.length]}>
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial map={texture} toneMapped={false} />
-      </instancedMesh>
-      {/* cheap planar reflection: a mirrored, 0.06-opacity copy below ground (§5.1) */}
-      <instancedMesh ref={reflectRef} args={[undefined, undefined, buildings.length]}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshBasicMaterial map={texture} transparent opacity={0.06} toneMapped={false} />
       </instancedMesh>
     </group>
   );

@@ -64,10 +64,18 @@ export function SignalForm() {
     <div className="signal-form-wrap">
       <Spotlight />
       <form className="signal-form" onSubmit={onSubmit} noValidate>
-        {/* honeypot — off-screen, not display:none (bots skip hidden fields) */}
-        <div className="signal-honeypot" aria-hidden="true">
-          <label htmlFor="company">Company</label>
-          <input id="company" name="company" type="text" tabIndex={-1} autoComplete="off" />
+        {/* honeypot — off-screen (not display:none, which bots skip). Labelled
+            (no aria-hidden) so it stays axe-clean; screen readers are told to
+            leave it empty, bots fill it. */}
+        <div className="signal-honeypot">
+          <label htmlFor="company">Leave this field empty</label>
+          <input
+            id="company"
+            name="company"
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+          />
         </div>
 
         <div className="signal-field">

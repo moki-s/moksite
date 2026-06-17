@@ -47,5 +47,9 @@ next-env.d.ts
 /blob-report/
 /playwright/.cache/
 
+# lighthouse ci
+/lhci-report/
+/.lighthouseci/
+
 # source-of-truth CV (PII: phone number) — never commit to the public repo (§A.6)
 /docs/cv-master.pdf

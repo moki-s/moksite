@@ -40,15 +40,22 @@ export function HeroGate() {
   const [loaded, setLoaded] = useState(false);
   const [active, setActive] = useState(true);
 
-  // capability gate
+  // capability gate — the 3D cold-open is a desktop-class enhancement. Phones,
+  // tablets, touch and low-power devices keep the poster (the LCP element and the
+  // §16 fallback); this is also what keeps mobile LCP/TBT inside the §2 budget,
+  // since a continuously-animating WebGL scene saturates a throttled main thread.
   useEffect(() => {
     if (!motionEnabled) {
       setShow3D(false);
       return;
     }
-    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
-    const lowMem = typeof deviceMemory === "number" && deviceMemory < 4;
-    setShow3D(!lowMem && supportsWebGL2());
+    const nav = navigator as Navigator & { deviceMemory?: number };
+    const lowMem = typeof nav.deviceMemory === "number" && nav.deviceMemory < 4;
+    const fewCores =
+      typeof nav.hardwareConcurrency === "number" && nav.hardwareConcurrency < 4;
+    const finePointer = window.matchMedia("(pointer: fine)").matches;
+    const wideEnough = window.innerWidth >= 1024;
+    setShow3D(!lowMem && !fewCores && finePointer && wideEnough && supportsWebGL2());
   }, [motionEnabled]);
 
   // pause when off-screen or the tab is hidden (§8)
@@ -73,9 +80,11 @@ export function HeroGate() {
   useIsomorphicLayoutEffect(() => {
     if (!motionEnabled || !nameRef.current) return;
     const ctx = gsap.context(() => {
+      // Scale-only settle — no opacity gate. The <h1> is the LCP element, so it
+      // must stay painted from first paint; animating autoAlpha would hide it
+      // until hydration and push LCP past the §2 budget.
       gsap.from(nameRef.current, {
-        autoAlpha: 0,
-        scale: 1.06,
+        scale: 1.05,
         duration: dur.enter.duration,
         ease: dur.enter.ease,
       });

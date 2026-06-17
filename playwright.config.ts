@@ -13,7 +13,10 @@ export default defineConfig({
     baseURL: "http://localhost:3000",
     trace: "off",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    { name: "webkit", use: { ...devices["Desktop Safari"] } }, // Safari engine (§12)
+  ],
   webServer: {
     command: "pnpm start",
     url: "http://localhost:3000",
