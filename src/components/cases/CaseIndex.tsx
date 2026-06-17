@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import { useMotion } from "@/components/MotionProvider";
 import { dur } from "@/lib/motion";
+import { track } from "@/lib/analytics";
 import { CaseFolder } from "@/components/cases/CaseFolder";
 import type { CaseEntry } from "@/lib/content";
 
@@ -16,6 +17,7 @@ export function CaseIndex({ cases }: { cases: CaseEntry[] }) {
   const overlayRef = useRef<HTMLDivElement>(null);
 
   const onActivate = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
+    track("case_open", { slug: href.replace("/case/", "") });
     const overlay = overlayRef.current;
     if (!motionEnabled || !overlay) return; // let the <Link> navigate
     event.preventDefault();

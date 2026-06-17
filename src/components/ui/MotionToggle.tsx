@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAppStore } from "@/store/useAppStore";
+import { track } from "@/lib/analytics";
 
 // §9 — footer MOTION: ON/OFF toggle. Overrides system preference, persisted via
 // the Zustand store. Renders a stable label until mounted to avoid hydration
@@ -27,7 +28,11 @@ export function MotionToggle() {
       type="button"
       className="motion-toggle"
       aria-pressed={mounted ? enabled : undefined}
-      onClick={() => setMotionPref(enabled ? "off" : "on")}
+      onClick={() => {
+        const next = enabled ? "off" : "on";
+        setMotionPref(next);
+        track("motion_toggle", { state: next });
+      }}
     >
       MOTION: {mounted ? (enabled ? "ON" : "OFF") : "ON"}
     </button>

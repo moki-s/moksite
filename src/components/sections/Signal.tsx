@@ -1,8 +1,9 @@
 import { Panel } from "@/components/panels/Panel";
 import { siteConfig } from "@/content/site";
+import { SignalForm } from "@/components/contact/SignalForm";
 
-// §5.6 (Phase-2 layout) — the panel + the always-plain direct lines so #signal
-// lands. The searchlight contact form + /api/contact are built in Phase 6.
+// §5.6 — Panel 5. The SignalForm (cursor-following spotlight) + the always-plain
+// direct lines below it.
 export function Signal() {
   return (
     <Panel
@@ -12,7 +13,7 @@ export function Signal() {
       transition="gutter"
     >
       <h2 className="section-title">Send a Signal</h2>
-      <p className="signal-lead">The direct lines:</p>
+      <SignalForm />
       <ul className="signal-links">
         <li>
           <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>

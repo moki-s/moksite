@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useAppStore } from "@/store/useAppStore";
+import { track } from "@/lib/analytics";
 import type { CaseMeta } from "@/components/terminal/registry";
 
 // The terminal chunk loads lazily on first discovery only (§8): Terminal is
@@ -45,6 +46,7 @@ export function TerminalLauncher({ cases }: { cases: CaseMeta[] }) {
 
       if (e.key === "`" && !typing) {
         e.preventDefault();
+        track("terminal_open", { method: "key" });
         openTerminal();
         return;
       }
@@ -54,6 +56,7 @@ export function TerminalLauncher({ cases }: { cases: CaseMeta[] }) {
         konami.current += 1;
         if (konami.current === KONAMI.length) {
           konami.current = 0;
+          track("terminal_open", { method: "konami" });
           openTerminal();
         }
       } else {

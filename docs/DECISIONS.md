@@ -3,6 +3,25 @@
 Accepted deviations from the PRD and one-line justifications for anything that
 needs explaining (per CLAUDE.md / PRD §0.3). Newest first.
 
+## Phase 6 — Contact & instrumentation
+
+- **Real email end-to-end is deferred** until the owner sets `RESEND_API_KEY` +
+  `CONTACT_TO_EMAIL` (their timeline). The route is complete; without the key it
+  fails closed (**500** → the form shows the mailto fallback). Sandbox sender
+  `onboarding@resend.dev` is used until a domain is verified.
+- **Anti-spam returns 200 silently** for the honeypot (`company`) and the < 3 s
+  time-trap, so bots aren't tipped off (§7.4). Per-IP throttle is in-memory
+  (5/hr, best-effort, resets on cold start). **Message content is never logged.**
+- **`contactSchema` is shared** (client + server) in `lib/schemas.ts`.
+- **Analytics wrapper no-ops** unless Plausible is loaded; the script mounts only
+  when `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` is set. Wired: skip_intro,
+  terminal_open{method}, terminal_command{name}, case_open{slug},
+  cv_download{source}, contact_submit{ok}, motion_toggle{state}, easteregg{id}.
+- **Favicons from the stamp motif** — `app/icon.svg` (ink · blood rotated frame ·
+  amber lit-window square) + `app/apple-icon.png` (via sharp) + `app/manifest.ts`;
+  the create-next-app `favicon.ico` is removed.
+- **404** (`not-found.tsx`) finalized with the §5.9 copy + the terminal hint.
+
 ## Phase 5 — Command Center
 
 - **Terminal chunk loads lazily on first discovery.** `TerminalLauncher` (main

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Anton, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import "../styles/globals.css";
 import { siteConfig } from "@/content/site";
@@ -53,6 +54,7 @@ export default function RootLayout({
     year: c.year,
     order: c.order,
   }));
+  const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
   return (
     <html
       lang="en"
@@ -69,6 +71,14 @@ export default function RootLayout({
           <Footer />
           <TerminalLauncher cases={caseList} />
         </MotionProvider>
+        {plausibleDomain && (
+          <Script
+            defer
+            data-domain={plausibleDomain}
+            src="https://plausible.io/js/script.js"
+            strategy="afterInteractive"
+          />
+        )}
       </body>
     </html>
   );

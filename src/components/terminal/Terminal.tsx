@@ -12,6 +12,7 @@ import {
 } from "@/components/terminal/registry";
 import { useAppStore } from "@/store/useAppStore";
 import { useMotion } from "@/components/MotionProvider";
+import { track } from "@/lib/analytics";
 import { Crt } from "@/components/terminal/Crt";
 
 const BOOT =
@@ -69,6 +70,7 @@ export default function Terminal({ cases }: { cases: CaseMeta[] }) {
         router.push(href);
       },
       downloadCv: () => {
+        track("cv_download", { source: "terminal" });
         const a = document.createElement("a");
         a.href = "/cv.pdf";
         a.download = "";
@@ -98,7 +100,12 @@ export default function Terminal({ cases }: { cases: CaseMeta[] }) {
     setHistory((h) => [...h, trimmed]);
     setHistIdx(-1);
     const [name, ...args] = trimmed.split(/\s+/);
-    const command = commandMap.get(name.toLowerCase());
+    const cmd = name.toLowerCase();
+    track("terminal_command", { name: cmd });
+    if (cmd === "coffee" || (cmd === "sudo" && (args[0] ?? "").toLowerCase() === "hire-me")) {
+      track("easteregg", { id: cmd === "coffee" ? "coffee" : "hire-me" });
+    }
+    const command = commandMap.get(cmd);
     const output: Output = command ? await command.run(args, ctx) : [UNKNOWN_LINE];
     setEntries((p) => [...p, { input: trimmed, output }]);
     setInput("");

@@ -25,6 +25,7 @@
     "next-mdx-remote": "^6.0.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "resend": "^6.12.4",
     "three": "^0.184.0",
     "zod": "^4.4.3",
     "zustand": "^5.0.14"

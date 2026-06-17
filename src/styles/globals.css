@@ -1204,3 +1204,106 @@ html.high-contrast *::after {
 .notfound-hint:hover {
   color: var(--signal);
 }
+
+/* ==========================================================================
+   Phase 6 — Send a Signal (contact form)
+   ========================================================================== */
+.signal-form-wrap {
+  position: relative;
+  max-width: 38rem;
+  margin-bottom: 2.5rem;
+}
+.signal-spotlight {
+  position: absolute;
+  inset: -2rem;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    220px circle at var(--x, 50%) var(--y, 30%),
+    color-mix(in srgb, var(--signal) 18%, transparent),
+    transparent 70%
+  );
+}
+.signal-form {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.signal-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.signal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.signal-field label {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--rain);
+}
+.signal-field input,
+.signal-field textarea {
+  padding: 0.65rem 0.8rem;
+  background: color-mix(in srgb, var(--ink) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rain) 40%, transparent);
+  color: var(--bone);
+  font-family: var(--font-plex-sans), sans-serif;
+  font-size: var(--text-body);
+  resize: vertical;
+}
+.signal-field input:focus-visible,
+.signal-field textarea:focus-visible {
+  border-color: var(--signal);
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+.signal-field input[aria-invalid="true"],
+.signal-field textarea[aria-invalid="true"] {
+  border-color: var(--blood);
+}
+.signal-error {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-caption);
+  color: var(--blood);
+}
+.signal-submit {
+  align-self: flex-start;
+  padding: 0.7rem 1.5rem;
+  background: var(--signal);
+  border: 0;
+  color: var(--ink);
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+}
+.signal-submit:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.signal-status {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.signal-sent {
+  color: var(--signal);
+}
+.signal-lost {
+  color: var(--blood);
+}
+.signal-lost a {
+  color: var(--signal);
+  text-decoration: underline;
+}

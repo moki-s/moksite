@@ -11,6 +11,7 @@ import { siteConfig } from "@/content/site";
 import { CaptionBox } from "@/components/panels/CaptionBox";
 import { Lightning } from "@/components/hero/Lightning";
 import { dur } from "@/lib/motion";
+import { track } from "@/lib/analytics";
 
 // The 3D scene is the ONLY importer of three/@react-three/fiber, and it is pulled
 // in exclusively here via dynamic(ssr:false) → three stays out of the initial
@@ -107,7 +108,14 @@ export function HeroGate() {
 
       {show3D && <Lightning />}
 
-      <button type="button" className="hero-skip" onClick={() => scrollTo("#cases")}>
+      <button
+        type="button"
+        className="hero-skip"
+        onClick={() => {
+          track("skip_intro");
+          scrollTo("#cases");
+        }}
+      >
         SKIP THE INTRO →
       </button>
 
@@ -123,7 +131,10 @@ export function HeroGate() {
         type="button"
         className="hero-hotspot"
         aria-label="A lit window. Something hums inside."
-        onClick={openTerminal}
+        onClick={() => {
+          track("terminal_open", { method: "window" });
+          openTerminal();
+        }}
       />
     </section>
   );
