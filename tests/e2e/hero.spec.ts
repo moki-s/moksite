@@ -2,11 +2,12 @@ import { test, expect } from "@playwright/test";
 
 test("SKIP THE INTRO is usable within 1s and scrolls to #cases", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" }); // deterministic native scroll
+  const start = Date.now();
   await page.goto("/", { waitUntil: "commit" });
   const skip = page.getByRole("button", { name: "SKIP THE INTRO →" });
-  await expect(skip).toBeVisible({ timeout: 1000 });
+  await skip.waitFor({ state: "visible" });
+  expect(Date.now() - start, "skip usable within 1s").toBeLessThan(1000);
   await skip.click();
-  await page.waitForTimeout(500);
   await expect(page.locator("#cases")).toBeInViewport({ ratio: 0.2 });
 });
 

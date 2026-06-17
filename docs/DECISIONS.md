@@ -3,6 +3,32 @@
 Accepted deviations from the PRD and one-line justifications for anything that
 needs explaining (per CLAUDE.md / PRD §0.3). Newest first.
 
+## Phase 5 — Command Center
+
+- **Terminal chunk loads lazily on first discovery.** `TerminalLauncher` (main
+  bundle, in layout) holds the global `` ` ``/Konami listener + high-contrast
+  sync and only `dynamic(ssr:false)`-renders `Terminal` once `terminalOpen`
+  flips true, so the terminal + command registry are a lazy chunk (§8).
+- **Real socials/contact; only the bio is `[TODO-CONTENT]`.** `socials` /
+  `contact` / `cv` / `cases` / `stack` read resolved data (siteConfig,
+  layout-passed cases, arsenal) so people can reach out (owner's CV ask). Only
+  the `whoami` 3-line bio stays `[TODO-CONTENT]` (`site.ts` `terminalBio`; PRD
+  A.5 has a draft). `sudo hire-me` uses the resolved name. This deviates from the
+  Phase-5 prompt's literal "socials `[TODO-CONTENT]`" — owner-confirmed.
+- **Renames (CLAUDE.md):** prompt `moksite@cmd:~$`, boot `MOKSITE OS v1.0 — …`.
+- **Cases passed from the server layout** to the client terminal (`getAllCases`
+  is fs-bound and can't run client-side).
+- **`sudo hire-me`** is the `sudo` command with arg dispatch (`registry` keys by
+  the first token).
+- **Minimal `not-found.tsx`** added now to wire the 404 discovery hint; full 404
+  visual polish is Phase 6/7.
+- **Initial JS on `/` is 181 KB gz — 1 KB over the 180 target** (the shared
+  terminal launcher in the root layout). The terminal itself is a correctly-lazy
+  3 KB chunk. 181 is within the enforced +20%-regression gate (216 KB). The clean
+  fix — lazy-load gsap/lenis so they leave the shared bundle (~30 KB headroom) —
+  is deferred to the Phase 7 perf pass rather than risk a motion-layer refactor
+  late in Phase 5.
+
 ## Phase 4 — 3D cold open
 
 - **three/@react-three/fiber are code-split into a lazy chunk** imported only via

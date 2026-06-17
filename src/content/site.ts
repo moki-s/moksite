@@ -78,6 +78,10 @@ export const origin: string[] = [
   "Founding-team years in health-tech and EdTech taught me the rule: everything ships with your name on it. Currently finishing an MSc in Advanced Computer Science in Birmingham. The signal's on — I take cases.",
 ];
 
+// §5.7 — terminal `whoami` bio (3 lines). PRD A.5 has a resolved draft the owner
+// can drop in; kept [TODO-CONTENT] per the Phase 5 brief.
+export const terminalBio: string[] = ["[TODO-CONTENT]", "[TODO-CONTENT]", "[TODO-CONTENT]"];
+
 export type Testimonial = { quote: string; name: string; role: string };
 
 // No real testimonials yet — Panel 4 is cut entirely if this stays empty (§3).

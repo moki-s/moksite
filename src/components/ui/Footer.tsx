@@ -1,5 +1,6 @@
 import { siteConfig } from "@/content/site";
 import { MotionToggle } from "@/components/ui/MotionToggle";
+import { TerminalHint } from "@/components/terminal/TerminalHint";
 
 // §6.4 — footer copy verbatim + the always-plain contact lines + MOTION toggle.
 export function Footer() {
@@ -28,7 +29,7 @@ export function Footer() {
             SIDEKICKS WERE HARMED.
           </p>
           <div className="footer-controls">
-            <span className="footer-psst">psst — press [ ` ]</span>
+            <TerminalHint />
             <MotionToggle />
           </div>
         </div>

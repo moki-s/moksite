@@ -14,6 +14,8 @@ type AppState = {
   terminalOpen: boolean;
   openTerminal: () => void;
   closeTerminal: () => void;
+  highContrast: boolean;
+  toggleHighContrast: () => void;
 };
 
 export const useAppStore = create<AppState>()(
@@ -26,10 +28,15 @@ export const useAppStore = create<AppState>()(
       terminalOpen: false,
       openTerminal: () => set({ terminalOpen: true }),
       closeTerminal: () => set({ terminalOpen: false }),
+      highContrast: false,
+      toggleHighContrast: () => set((s) => ({ highContrast: !s.highContrast })),
     }),
     {
       name: "moksite-prefs",
-      partialize: (state) => ({ motionPref: state.motionPref }),
+      partialize: (state) => ({
+        motionPref: state.motionPref,
+        highContrast: state.highContrast,
+      }),
     },
   ),
 );

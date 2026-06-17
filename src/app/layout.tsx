@@ -7,6 +7,8 @@ import { MotionProvider } from "@/components/MotionProvider";
 import { Grain } from "@/components/ui/Grain";
 import { NavBar } from "@/components/ui/NavBar";
 import { Footer } from "@/components/ui/Footer";
+import { TerminalLauncher } from "@/components/terminal/TerminalLauncher";
+import { getAllCases } from "@/lib/content";
 
 // §4.2 — three self-hosted families via next/font/google.
 const anton = Anton({
@@ -45,6 +47,12 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const caseList = getAllCases().map((c) => ({
+    slug: c.slug,
+    title: c.title,
+    year: c.year,
+    order: c.order,
+  }));
   return (
     <html
       lang="en"
@@ -59,6 +67,7 @@ export default function RootLayout({
           <NavBar />
           {children}
           <Footer />
+          <TerminalLauncher cases={caseList} />
         </MotionProvider>
       </body>
     </html>

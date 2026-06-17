@@ -938,3 +938,269 @@ html.no-motion .hero-css-rain {
   color: var(--bone);
   opacity: 0;
 }
+
+/* ==========================================================================
+   Phase 5 — Command Center (terminal)
+   ========================================================================== */
+.terminal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  background: color-mix(in srgb, var(--ink) 96%, transparent);
+  animation: terminal-slide 0.3s ease;
+  outline: none;
+}
+@keyframes terminal-slide {
+  from {
+    transform: translateY(2%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+html.no-motion .terminal-overlay {
+  animation: none;
+}
+
+.crt {
+  position: relative;
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+.crt-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+.crt-scanlines {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.5;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 2px,
+    color-mix(in srgb, var(--ink) 55%, transparent) 2px 3px
+  );
+}
+.crt-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  box-shadow: inset 0 0 180px 40px color-mix(in srgb, var(--ink) 90%, transparent);
+}
+
+.terminal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--signal) 30%, transparent);
+}
+.terminal-title,
+.terminal-prompt,
+.terminal-input,
+.terminal-out,
+.terminal-boot,
+.terminal-booting,
+.terminal-echo,
+.terminal-ascii,
+.terminal-tap {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-meta);
+}
+.terminal-title {
+  color: var(--signal);
+  letter-spacing: 0.12em;
+}
+.terminal-close {
+  background: transparent;
+  border: 0;
+  color: var(--rain);
+  cursor: pointer;
+  font-size: var(--text-body);
+}
+.terminal-close:hover {
+  color: var(--signal);
+}
+
+.terminal-log {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 0;
+  color: var(--signal);
+  line-height: 1.6;
+}
+.terminal-boot {
+  margin-bottom: 0.5rem;
+  color: var(--rain);
+}
+.terminal-booting {
+  color: var(--signal);
+  animation: terminal-blink 1s steps(1) infinite;
+}
+.terminal-entry {
+  margin-bottom: 0.25rem;
+}
+.terminal-echo {
+  color: var(--bone);
+}
+.terminal-echo .terminal-prompt {
+  color: var(--signal);
+}
+.terminal-out {
+  color: var(--signal);
+  white-space: pre-wrap;
+}
+.terminal-out a {
+  color: var(--signal);
+  text-decoration: underline;
+}
+.terminal-ascii {
+  color: var(--signal);
+  white-space: pre;
+  line-height: 1.1;
+}
+.tone-rain {
+  color: var(--rain);
+}
+.tone-signal {
+  color: var(--signal);
+}
+.tone-blood {
+  color: var(--blood);
+}
+.tone-default {
+  color: var(--signal);
+}
+
+.terminal-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--signal) 30%, transparent);
+}
+.terminal-input-row .terminal-prompt {
+  color: var(--signal);
+}
+.terminal-input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  color: var(--signal);
+  caret-color: var(--signal);
+  outline: none;
+}
+@keyframes terminal-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.terminal-taprow {
+  display: none;
+}
+@media (max-width: 640px) {
+  .crt-inner {
+    max-width: none;
+    padding: 1rem;
+  }
+  .terminal-taprow {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 0.5rem 0;
+  }
+  .terminal-tap {
+    flex: 0 0 auto;
+    padding: 0.4rem 0.8rem;
+    background: transparent;
+    border: 1px solid color-mix(in srgb, var(--signal) 40%, transparent);
+    color: var(--signal);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+  }
+}
+
+/* footer hint is now a button */
+.footer-psst {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.footer-psst:hover {
+  color: var(--signal);
+}
+
+/* §5.7 — high-contrast theme: pure bone/black, motion off */
+html.high-contrast {
+  --color-ink: #000000;
+  --color-midnight: #050505;
+  --color-bone: #ffffff;
+  --color-rain: #c8c8c8;
+  --color-signal: #ffd24a;
+  --color-blood: #ff5a4d;
+}
+html.high-contrast *,
+html.high-contrast *::before,
+html.high-contrast *::after {
+  animation-duration: 0.001ms !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* §5.9 — 404 */
+.notfound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  min-height: 100vh;
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+.notfound-title {
+  font-family: var(--font-anton), sans-serif;
+  font-size: var(--text-display);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: var(--bone);
+}
+.notfound-sub {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-meta);
+  color: var(--rain);
+}
+.notfound-link {
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--signal);
+}
+.notfound-hint {
+  margin-top: 1rem;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-caption);
+  letter-spacing: 0.08em;
+  color: color-mix(in srgb, var(--rain) 70%, transparent);
+}
+.notfound-hint:hover {
+  color: var(--signal);
+}
