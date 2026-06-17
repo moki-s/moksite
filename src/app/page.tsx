@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { absoluteUrl, personJsonLd } from "@/lib/seo";
-import { HeroPoster } from "@/components/hero/HeroPoster";
+import { HeroGate } from "@/components/hero/HeroGate";
 import { Origin } from "@/components/sections/Origin";
 import { CaseFiles } from "@/components/sections/CaseFiles";
 import { Arsenal } from "@/components/sections/Arsenal";
@@ -19,7 +19,7 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd()) }}
       />
-      <HeroPoster />
+      <HeroGate />
       <Origin />
       <CaseFiles />
       <Arsenal />

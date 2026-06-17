@@ -225,9 +225,7 @@ html.no-motion .hero-caption {
   padding: 1.5rem;
   text-align: center;
   background-color: var(--ink);
-  background-image: url("/poster/hero-placeholder.svg");
-  background-size: cover;
-  background-position: center;
+  overflow: hidden;
 }
 .hero-skip {
   position: absolute;
@@ -854,4 +852,89 @@ html.no-motion .hero-caption {
 .case-next:hover,
 .case-return:hover {
   color: var(--bone);
+}
+
+/* ==========================================================================
+   Phase 4 — 3D cold open (hero)
+   ========================================================================== */
+.hero-poster-img {
+  object-fit: cover;
+  z-index: 0;
+}
+.hero-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.hero-canvas.is-loaded {
+  opacity: 1;
+}
+
+/* §5.1 fallback — animated CSS rain on the poster when 3D can't run but motion
+   is on (reduced motion shows neither, via html.no-motion below) */
+.hero-css-rain {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    14deg,
+    transparent 0 9px,
+    color-mix(in srgb, var(--rain) 22%, transparent) 9px 10px
+  );
+  background-size: 100% 220px;
+  opacity: 0.5;
+  animation: hero-rain 0.7s linear infinite;
+}
+@keyframes hero-rain {
+  to {
+    background-position: 0 220px;
+  }
+}
+html.no-motion .hero-css-rain {
+  animation: none;
+}
+
+/* §5.1 — lit-window hotspot: focusable, opens the Command Center (Phase 5) */
+.hero-hotspot {
+  position: absolute;
+  z-index: 10;
+  top: 56%;
+  left: 58%;
+  width: 28px;
+  height: 36px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.hero-hotspot:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 3px;
+}
+
+/* §5.1 — one-time lightning flash + KRAK— */
+.lightning {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+.lightning-flash {
+  position: absolute;
+  inset: 0;
+  background: var(--bone);
+  opacity: 0;
+}
+.lightning-krak {
+  position: absolute;
+  top: 26%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-anton), sans-serif;
+  font-size: var(--text-h1);
+  letter-spacing: 0.02em;
+  color: var(--bone);
+  opacity: 0;
 }

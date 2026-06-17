@@ -12,6 +12,12 @@ const compat = new FlatCompat({
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
+    // React Three Fiber uses three.js props (args, attach, position, intensity…)
+    // on intrinsic elements — these are not DOM attributes.
+    files: ["src/components/hero/**/*.tsx"],
+    rules: { "react/no-unknown-property": "off" },
+  },
+  {
     ignores: [
       "node_modules/**",
       ".next/**",

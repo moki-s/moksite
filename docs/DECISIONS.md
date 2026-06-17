@@ -3,6 +3,27 @@
 Accepted deviations from the PRD and one-line justifications for anything that
 needs explaining (per CLAUDE.md / PRD §0.3). Newest first.
 
+## Phase 4 — 3D cold open
+
+- **three/@react-three/fiber are code-split into a lazy chunk** imported only via
+  `dynamic(() => import("CityScene"), { ssr: false })` inside HeroGate, so they
+  never enter the initial bundle (§8 ≤ 180 KB gz initial). **No `@react-three/drei`**
+  (keeps the 3D chunk ≤ 450 KB gz; drei is listed in §7.2 but using it is optional).
+  `@types/three` added (dev-only type defs).
+- **Hero consolidated into `HeroGate`** (poster + overlay + skip + hotspot +
+  CSS-rain fallback + 3D mount + lightning); `HeroPoster` removed.
+- **Lightning + the lit-window hotspot are DOM, not WebGL** — accessibility
+  (focusable `<button>` + aria-label) and keeps the GL scene minimal. The hotspot
+  calls the store `openTerminal()` (terminal UI lands in Phase 5).
+- **Pause = `<Canvas frameloop="never">`** when the hero is off-screen
+  (IntersectionObserver) or `document.hidden` (§8).
+- **`deviceMemory` undefined is treated as capable** — only an explicit `< 4`
+  gates the 3D scene out.
+- **Poster** is generated headlessly from the finished scene (Chromium +
+  SwiftShader) → 1600w AVIF/WebP at `public/poster/hero.avif`, wired via
+  `next/image` (replaces the Phase-2 SVG placeholder). Conversion uses `sharp`
+  (added as a devDep — already a transitive Next dependency).
+
 ## Content pass — real CV content (16 Jun 2026)
 
 Resolved the site content from the owner's final CV (Technical Product Manager;
