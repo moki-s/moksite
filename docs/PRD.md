@@ -138,7 +138,7 @@ All GSAP timelines must consume these tokens. `prefers-reduced-motion` ⇒ every
 **Scene (R3F), in one sentence:** a low-poly night city skyline in `--midnight` silhouettes under fog, rain falling, one amber searchlight cone sweeping the sky, one lit window glowing amber.
 - **Build the city procedurally — no Blender required:** 3 depth rows of instanced box buildings (~60 instances total) with slight height/width jitter (seeded random — same skyline every visit); emissive "windows" via a tiny generated canvas texture (random lit windows, ~8% lit, amber tint); `fog(--ink, 8, 30)`; ground plane with faint reflection (cheap: planar mesh, 0.06 opacity copy — skip real reflections).
 - **Rain:** GPU-instanced ≤ 400 short line segments cycling downward; opacity 0.25.
-- **Searchlight:** narrow cone mesh, additive blending, slow sweep (12 s loop), pointing at empty sky. **It projects no logo or emblem** (§15).
+- **Searchlight:** nested additive cones (a solid-reading shaft falling off through the fog), slow **eased** sweep (~14 s loop, lingers at the arc edges), pointing at empty sky. It projects **one original mark only — the owner's stylised "M" monogram** as a faint negative-space stencil, brightest where the beam crests; **never a franchise emblem** (§15, owner-approved amendment).
 - **Lightning:** on first load only — a 120 ms `--bone` full-screen flash (z-60) that silhouettes the city, with a small `KRAK—` caption; never repeats in-session (Zustand flag).
 - **The lit window** is a clickable/focusable hotspot (`aria-label="A lit window. Something hums inside."`) → opens the Command Center (§5.7 discovery path 2).
 - **Camera:** static framing; pointer parallax ±3° (lerped); on mobile no gyroscope in v1 (avoid permission prompts).
@@ -387,7 +387,7 @@ Full manual matrix esp. Safari; axe + Lighthouse CI gates locked; replace every 
 ---
 
 ## 15. IP guardrails (non-negotiable)
-Original noir-vigilante aesthetic — genre, not franchise. ❌ No bat emblem or any silhouette readable as one; no "Gotham/Wayne/Batcave/Bat-" naming; no DC names, quotes, traced artwork, or franchise-associated logotypes; searchlight projects nothing. ✅ Generic noir devices: rain, rooftops, searchlights, case files, dossiers, an original lair terminal. Codename **NIGHTFRAME** is a placeholder — rename freely, keep it original, and run a quick trademark search if you'll freelance under it.
+Original noir-vigilante aesthetic — genre, not franchise. ❌ No bat emblem or any silhouette readable as one; no "Gotham/Wayne/Batcave/Bat-" naming; no DC names, quotes, traced artwork, or franchise-associated logotypes. The searchlight may project **only an original mark — the owner's stylised "M" monogram** (a bare letterform; no shield, circle, or enclosure that could read as a logo lockup), and **never** a franchise emblem or any silhouette readable as one (owner-approved amendment, 2026-06 — see DECISIONS.md). ✅ Generic noir devices: rain, rooftops, searchlights, case files, dossiers, an original lair terminal. Codename **NIGHTFRAME** is a placeholder — rename freely, keep it original, and run a quick trademark search if you'll freelance under it.
 
 ## 16. Risks
 | Risk | Mitigation |

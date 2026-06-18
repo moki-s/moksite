@@ -32,7 +32,8 @@ function makeWindowTexture(): THREE.CanvasTexture {
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
       const lit = rng() < 0.08;
-      ctx.globalAlpha = lit ? 0.6 + rng() * 0.4 : 1;
+      // dimmer than before so the searchlight stays the dominant warm light (§4)
+      ctx.globalAlpha = lit ? 0.38 + rng() * 0.28 : 1;
       ctx.fillStyle = lit ? "#f5a623" : "#0e1320";
       ctx.fillRect(x * 16 + 4, y * 16 + 5, 8, 9);
     }
@@ -95,7 +96,7 @@ function City({ texture }: { texture: THREE.Texture }) {
   );
 }
 
-function Scene() {
+function Scene({ frozen = false }: { frozen?: boolean }) {
   const group = useRef<THREE.Group>(null);
   const texture = useMemo(() => makeWindowTexture(), []);
 
@@ -114,16 +115,18 @@ function Scene() {
     <group ref={group}>
       <City texture={texture} />
       <Rain />
-      <Searchlight />
+      <Searchlight frozen={frozen} />
     </group>
   );
 }
 
 export default function CityScene({
   active,
+  frozen = false,
   onCreated,
 }: {
   active: boolean;
+  frozen?: boolean;
   onCreated?: () => void;
 }) {
   return (
@@ -136,7 +139,7 @@ export default function CityScene({
     >
       <color attach="background" args={["#0b0e13"]} />
       <fog attach="fog" args={["#0b0e13", 8, 30]} />
-      <Scene />
+      <Scene frozen={frozen} />
     </Canvas>
   );
 }

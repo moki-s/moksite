@@ -3,6 +3,32 @@
 Accepted deviations from the PRD and one-line justifications for anything that
 needs explaining (per CLAUDE.md / PRD §0.3). Newest first.
 
+## Searchlight polish — cinematic beam + projected "M"
+
+- **§15 / §5.1 amended (owner-approved).** The original rule was "searchlight
+  projects nothing / no logo or emblem." The owner directed it to project an
+  **original "M" monogram** (their initial). IP-safe (no franchise asset), rendered
+  as a **bare letterform — no shield, circle, or enclosure** — so it reads as a
+  projected letter, not a logo lockup or bat-signal-style emblem.
+- **Cinematic beam, no new deps.** Nested additive `MeshBasicMaterial` cones
+  (core + volumetric falloff through the fog) + an eased ~14 s edge-dwell sweep;
+  the city's lit-window emissive is dimmed so the beam dominates (§4). **No
+  postprocessing** — `@react-three/postprocessing`/`drei` would be new deps; the
+  bloom/gobo is faked with core `three` only.
+- **The "M" is a gobo, not a bright glyph.** A runtime `CanvasTexture` (a soft
+  vertical light band with the bare "M" carved out via `destination-out`) on an
+  additive billboarded `Sprite`, peaking in opacity at the crest. `SpotLight.map`
+  (a true gobo) needs lit materials + a shadow camera, but the scene is unlit
+  `MeshBasicMaterial` and drei is a new dep — so the gobo-sprite is the no-dep path
+  (confirmed via Context7). The band texture is a **light glow, not a UI gradient**
+  — §4.1's no-gradient rule governs flat comic surfaces, not the 3D light source.
+- **Poster regenerated** from the upgraded scene via `scripts/generate-poster.mjs`
+  (playwright + sharp — existing devDeps). A `?poster=1` hook (`HeroGate`) forces
+  the scene on and freezes the beam at its crest with the M centred for a
+  deterministic 1600w AVIF capture (the LCP + mobile/no-WebGL fallback).
+- **Reduced-motion (§9):** the 3D never runs under reduced-motion (→ poster), so
+  the "static lit cone with the M" is the regenerated poster — no sweep.
+
 ## Phase 7 — Hardening & launch
 
 - **3D cold-open gated to desktop-class devices.** Phones, tablets, touch and

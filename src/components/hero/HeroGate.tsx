@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import gsap from "gsap";
@@ -40,11 +40,25 @@ export function HeroGate() {
   const [loaded, setLoaded] = useState(false);
   const [active, setActive] = useState(true);
 
+  // `?poster=1` forces the scene on (bypassing the capability gate) and freezes
+  // the searchlight at its crest — a deterministic frame for the poster-capture
+  // script (scripts/generate-poster.mjs). Harmless in normal use.
+  const isPoster = useMemo(
+    () =>
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).has("poster"),
+    [],
+  );
+
   // capability gate — the 3D cold-open is a desktop-class enhancement. Phones,
   // tablets, touch and low-power devices keep the poster (the LCP element and the
   // §16 fallback); this is also what keeps mobile LCP/TBT inside the §2 budget,
   // since a continuously-animating WebGL scene saturates a throttled main thread.
   useEffect(() => {
+    if (isPoster) {
+      setShow3D(true);
+      return;
+    }
     if (!motionEnabled) {
       setShow3D(false);
       return;
@@ -56,7 +70,7 @@ export function HeroGate() {
     const finePointer = window.matchMedia("(pointer: fine)").matches;
     const wideEnough = window.innerWidth >= 1024;
     setShow3D(!lowMem && !fewCores && finePointer && wideEnough && supportsWebGL2());
-  }, [motionEnabled]);
+  }, [motionEnabled, isPoster]);
 
   // pause when off-screen or the tab is hidden (§8)
   useEffect(() => {
@@ -111,7 +125,11 @@ export function HeroGate() {
 
       {show3D && (
         <div className={`hero-canvas${loaded ? " is-loaded" : ""}`} aria-hidden="true">
-          <CityScene active={active} onCreated={() => setLoaded(true)} />
+          <CityScene
+            active={active || isPoster}
+            frozen={isPoster}
+            onCreated={() => setLoaded(true)}
+          />
         </div>
       )}
 
