@@ -3,6 +3,27 @@
 Accepted deviations from the PRD and one-line justifications for anything that
 needs explaining (per CLAUDE.md / PRD §0.3). Newest first.
 
+## Hidden-object hunt + `vigilante` command
+
+- **Site-wide hover-to-spot game (§11).** 7 original-noir DOM hotspots (detective,
+  lit windows, cats, a neon sign, a doorway figure) overlaid per panel as focusable
+  `<button>`s drawn in inline SVG — **not 3D meshes**, to protect the §8 3D budget
+  and keep them keyboard-accessible. The found set persists in localStorage so it
+  survives navigating into a case and back. Each find fires `easteregg{id}` (§11,
+  id only, no PII).
+- **`vigilante` extends §5.7's "exact (v1)" command set.** It is registered in the
+  terminal registry but **hidden from `help` + tab-complete and treated as an
+  unknown command until all 7 props are found**; on unlock it prints an original
+  noir ASCII + a dry one-liner. Intentional, owner-requested deviation from §5.7.
+- **A11y (§9, §4.3):** hotspots are the last child of each panel, so the
+  skip-to-content link stays first and they sit after each panel's content in tab
+  order; each has a descriptive `aria-label` + `aria-pressed` + the global focus
+  ring. Reduced-motion → instant found state (no glow / flicker / stamp animation).
+  The tally is `role="status" aria-live="polite"`, revealed after the first find,
+  fixed below the sticky-nav z-index.
+- **No new deps; persisted state guarded by a `useMounted()` hook** so SSR/first
+  paint render the unfound state and there's no hydration mismatch.
+
 ## Searchlight polish — cinematic beam + projected "M"
 
 - **§15 / §5.1 amended (owner-approved).** The original rule was "searchlight

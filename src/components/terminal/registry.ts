@@ -40,6 +40,7 @@ import { sudo } from "./commands/sudo";
 import { coffee } from "./commands/coffee";
 import { clear } from "./commands/clear";
 import { exit } from "./commands/exit";
+import { vigilante } from "./commands/vigilante";
 
 export const commands: Command[] = [
   help,
@@ -53,6 +54,7 @@ export const commands: Command[] = [
   theme,
   sudo,
   coffee,
+  vigilante, // hidden from help/tab-complete until the §11 hunt is complete
   clear,
   exit,
 ];

@@ -1,5 +1,6 @@
 import { Panel } from "@/components/panels/Panel";
 import { CaptionBox } from "@/components/panels/CaptionBox";
+import { EvidenceLayerLazy } from "@/components/game/EvidenceLayerLazy";
 import { origin, siteConfig } from "@/content/site";
 
 // §5.3 — Panel 1, Origin. Copy lives in site.ts (origin = [TODO-CONTENT]); the
@@ -30,6 +31,7 @@ export function Origin() {
           <span>PORTRAIT</span>
         </div>
       </div>
+      <EvidenceLayerLazy panel="origin" />
     </Panel>
   );
 }

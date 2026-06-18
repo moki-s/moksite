@@ -12,6 +12,7 @@ import { CaptionBox } from "@/components/panels/CaptionBox";
 import { Lightning } from "@/components/hero/Lightning";
 import { dur } from "@/lib/motion";
 import { track } from "@/lib/analytics";
+import { EvidenceLayerLazy } from "@/components/game/EvidenceLayerLazy";
 
 // The 3D scene is the ONLY importer of three/@react-three/fiber, and it is pulled
 // in exclusively here via dynamic(ssr:false) → three stays out of the initial
@@ -163,6 +164,8 @@ export function HeroGate() {
           openTerminal();
         }}
       />
+
+      <EvidenceLayerLazy panel="hero" />
     </section>
   );
 }

@@ -14,6 +14,7 @@ import { useAppStore } from "@/store/useAppStore";
 import { useMotion } from "@/components/MotionProvider";
 import { track } from "@/lib/analytics";
 import { Crt } from "@/components/terminal/Crt";
+import { EVIDENCE_TOTAL } from "@/components/game/evidence";
 
 const BOOT =
   "MOKSITE OS v1.0 — UNAUTHORIZED ACCESS DETECTED… just kidding. welcome, detective. type 'help' to begin.";
@@ -27,6 +28,14 @@ export default function Terminal({ cases }: { cases: CaseMeta[] }) {
   const close = useAppStore((s) => s.closeTerminal);
   const toggleHighContrast = useAppStore((s) => s.toggleHighContrast);
   const { scrollTo } = useMotion();
+
+  // §11 — `vigilante` is unlocked only once all hidden props are found; until then
+  // it is hidden from help + tab-complete and treated as an unknown command.
+  const unlocked = useAppStore((s) => s.foundEvidence.length >= EVIDENCE_TOTAL);
+  const visibleCommands = useMemo(
+    () => commands.filter((c) => c.name !== "vigilante" || unlocked),
+    [unlocked],
+  );
 
   const [booted, setBooted] = useState(false);
   const [entries, setEntries] = useState<Entry[]>([]);
@@ -86,9 +95,9 @@ export default function Terminal({ cases }: { cases: CaseMeta[] }) {
       },
       toggleTheme: toggleHighContrast,
       cases,
-      commands: commands.map((c) => ({ name: c.name, description: c.description })),
+      commands: visibleCommands.map((c) => ({ name: c.name, description: c.description })),
     }),
-    [cases, close, router, scrollTo, toggleHighContrast],
+    [cases, close, router, scrollTo, toggleHighContrast, visibleCommands],
   );
 
   const runInput = async (raw: string) => {
@@ -102,10 +111,15 @@ export default function Terminal({ cases }: { cases: CaseMeta[] }) {
     const [name, ...args] = trimmed.split(/\s+/);
     const cmd = name.toLowerCase();
     track("terminal_command", { name: cmd });
-    if (cmd === "coffee" || (cmd === "sudo" && (args[0] ?? "").toLowerCase() === "hire-me")) {
-      track("easteregg", { id: cmd === "coffee" ? "coffee" : "hire-me" });
+    if (
+      cmd === "coffee" ||
+      (cmd === "sudo" && (args[0] ?? "").toLowerCase() === "hire-me") ||
+      (cmd === "vigilante" && unlocked)
+    ) {
+      track("easteregg", { id: cmd === "sudo" ? "hire-me" : cmd });
     }
-    const command = commandMap.get(cmd);
+    // vigilante stays "command not found" until the §11 hunt unlocks it
+    const command = cmd === "vigilante" && !unlocked ? undefined : commandMap.get(cmd);
     const output: Output = command ? await command.run(args, ctx) : [UNKNOWN_LINE];
     setEntries((p) => [...p, { input: trimmed, output }]);
     setInput("");
@@ -114,7 +128,7 @@ export default function Terminal({ cases }: { cases: CaseMeta[] }) {
   const complete = (raw: string) => {
     const current = raw.trim().toLowerCase();
     if (!current) return;
-    const matches = commands.map((c) => c.name).filter((n) => n.startsWith(current));
+    const matches = visibleCommands.map((c) => c.name).filter((n) => n.startsWith(current));
     if (matches.length === 1) {
       setInput(`${matches[0]} `);
     } else if (matches.length > 1) {

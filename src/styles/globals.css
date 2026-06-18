@@ -1310,3 +1310,136 @@ html.high-contrast *::after {
   color: var(--signal);
   text-decoration: underline;
 }
+
+/* §11 — hidden-object hunt: hotspots overlaid per panel + the corner tally. */
+.evidence-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-stamp); /* above content, below sticky nav */
+}
+.evidence-prop {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 2.4rem;
+  height: 2.4rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  pointer-events: auto;
+  cursor: pointer;
+  color: color-mix(in srgb, var(--rain) 55%, transparent);
+  opacity: 0.5;
+  transition:
+    color 0.2s ease-out,
+    opacity 0.2s ease-out,
+    filter 0.2s ease-out;
+}
+.evidence-art,
+.evidence-art svg {
+  display: block;
+  width: 1.6rem;
+  height: 1.6rem;
+}
+.evidence-prop:hover,
+.evidence-prop:focus-visible {
+  color: var(--signal);
+  opacity: 1;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--signal) 70%, transparent));
+}
+.evidence-prop:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 3px;
+}
+.evidence-prop[data-found] {
+  color: color-mix(in srgb, var(--signal) 60%, transparent);
+  opacity: 0.7;
+  cursor: default;
+}
+.evidence-stamp {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  pointer-events: none;
+  transform: translateX(-50%);
+  animation: evidence-stamp-in 0.3s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+@keyframes evidence-stamp-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scale(0.85);
+  }
+}
+/* a faint flicker lures the eye to the lit-window / neon props (unfound only) */
+.evidence-prop--window:not([data-found]) .evidence-art,
+.evidence-prop--neon:not([data-found]) .evidence-art {
+  animation: evidence-flicker 4.5s steps(1, end) infinite;
+}
+@keyframes evidence-flicker {
+  0%,
+  90%,
+  100% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 0.35;
+  }
+  95% {
+    opacity: 0.9;
+  }
+}
+
+/* §11 corner tally */
+.evidence-tally {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 30; /* below the sticky nav (--z-nav: 40) */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  pointer-events: none;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--text-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.evidence-tally-count {
+  color: var(--rain);
+  background: color-mix(in srgb, var(--ink) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rain) 35%, transparent);
+  padding: 0.3rem 0.6rem;
+}
+.evidence-tally-flash {
+  color: var(--signal);
+  background: color-mix(in srgb, var(--ink) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--signal) 50%, transparent);
+  padding: 0.3rem 0.6rem;
+  animation: evidence-flash-in 0.4s ease both;
+}
+@keyframes evidence-flash-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* reduced motion (§9): findable, but instant — no glow transition, flicker, or pop */
+html.no-motion .evidence-prop,
+html.no-motion .evidence-stamp,
+html.no-motion .evidence-art,
+html.no-motion .evidence-tally-flash {
+  transition: none !important;
+  animation: none !important;
+}

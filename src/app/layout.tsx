@@ -9,6 +9,7 @@ import { Grain } from "@/components/ui/Grain";
 import { NavBar } from "@/components/ui/NavBar";
 import { Footer } from "@/components/ui/Footer";
 import { TerminalLauncher } from "@/components/terminal/TerminalLauncher";
+import { EvidenceTallyLazy } from "@/components/game/EvidenceTallyLazy";
 import { getAllCases } from "@/lib/content";
 
 // §4.2 — three self-hosted families via next/font/google.
@@ -70,6 +71,7 @@ export default function RootLayout({
           {children}
           <Footer />
           <TerminalLauncher cases={caseList} />
+          <EvidenceTallyLazy />
         </MotionProvider>
         {plausibleDomain && (
           <Script

@@ -16,6 +16,9 @@ type AppState = {
   closeTerminal: () => void;
   highContrast: boolean;
   toggleHighContrast: () => void;
+  // §11 — hidden-object hunt; persisted so it survives navigating into a case.
+  foundEvidence: string[];
+  markFound: (id: string) => void;
 };
 
 export const useAppStore = create<AppState>()(
@@ -30,12 +33,20 @@ export const useAppStore = create<AppState>()(
       closeTerminal: () => set({ terminalOpen: false }),
       highContrast: false,
       toggleHighContrast: () => set((s) => ({ highContrast: !s.highContrast })),
+      foundEvidence: [],
+      markFound: (id) =>
+        set((s) =>
+          s.foundEvidence.includes(id)
+            ? s
+            : { foundEvidence: [...s.foundEvidence, id] },
+        ),
     }),
     {
       name: "moksite-prefs",
       partialize: (state) => ({
         motionPref: state.motionPref,
         highContrast: state.highContrast,
+        foundEvidence: state.foundEvidence,
       }),
     },
   ),

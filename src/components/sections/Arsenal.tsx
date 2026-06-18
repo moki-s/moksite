@@ -1,5 +1,6 @@
 import { Bot, Code, Database, Workflow, type LucideIcon } from "lucide-react";
 import { Panel } from "@/components/panels/Panel";
+import { EvidenceLayerLazy } from "@/components/game/EvidenceLayerLazy";
 import { arsenal } from "@/content/site";
 
 // §5.5 — Panel 3, The Arsenal. Equipment grid, grouped, lucide icons, no skill
@@ -36,6 +37,7 @@ export function Arsenal() {
           </div>
         ))}
       </div>
+      <EvidenceLayerLazy panel="arsenal" />
     </Panel>
   );
 }
