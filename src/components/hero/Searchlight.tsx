@@ -4,42 +4,54 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
-// §5.1 / §15 (amended — see DECISIONS.md): a single amber shaft of light that
-// projects an ORIGINAL "M" monogram (the owner's initial) as a faint negative-space
-// stencil — no franchise emblem, no shield/circle, no logo lockup. The beam is
-// nested additive cones (a solid-reading shaft that falls off through the scene
-// fog); the M is a gobo (a soft amber band with the letter carved out, so it reads
-// as the *absence* of light, not a glowing glyph). §4: this is the one dominant
-// warm light — the city emissive is dimmed so the beam stays the focus.
+// §5.1 / §15 (amended — see DECISIONS.md): a single amber shaft of light rising
+// from the beacon tower's roof, projecting an ORIGINAL "M" monogram (the owner's
+// initial) as a negative-space stencil in the upper sky — no franchise emblem,
+// no shield/lockup. §4: the one dominant warm light.
 
 const SIGNAL = "#f5a623";
 
-// Soft vertical light band with a clean geometric "M" carved out (destination-out)
-// → negative space. Bare strokes only: two verticals + a centre V, no enclosing
-// shape, so it reads as a projected letter, not a badge. Drawn at runtime — no
-// downloaded asset (§8).
+// Vertical brightness gradient for the beam: opaque at the source (tower roof),
+// fading to transparent up into the sky → reads as a real shaft of light.
+function makeBeamTexture(): THREE.CanvasTexture {
+  const w = 4;
+  const h = 256;
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d")!;
+  const g = ctx.createLinearGradient(0, h, 0, 0); // bottom (source) → top
+  g.addColorStop(0, "rgba(255,255,255,1)");
+  g.addColorStop(0.55, "rgba(255,255,255,0.55)");
+  g.addColorStop(0.85, "rgba(255,255,255,0.18)");
+  g.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, w, h);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+  return tex;
+}
+
+// Soft vertical band with a clean geometric "M" carved out (destination-out) →
+// negative space. Bare strokes only, no enclosing shape (§15).
 function makeSignalTexture(): THREE.CanvasTexture {
   const s = 256;
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = s;
   const ctx = canvas.getContext("2d")!;
-
-  // soft vertical band (reads as a segment of the beam, not a disc/badge)
   const v = ctx.createLinearGradient(0, 0, 0, s);
   v.addColorStop(0, "rgba(255,255,255,0)");
   v.addColorStop(0.5, "rgba(255,255,255,1)");
   v.addColorStop(1, "rgba(255,255,255,0)");
   ctx.fillStyle = v;
   ctx.fillRect(0, 0, s, s);
-  const h = ctx.createLinearGradient(0, 0, s, 0);
-  h.addColorStop(0, "rgba(0,0,0,0)");
-  h.addColorStop(0.5, "rgba(0,0,0,1)");
-  h.addColorStop(1, "rgba(0,0,0,0)");
+  const hgrad = ctx.createLinearGradient(0, 0, s, 0);
+  hgrad.addColorStop(0, "rgba(0,0,0,0)");
+  hgrad.addColorStop(0.5, "rgba(0,0,0,1)");
+  hgrad.addColorStop(1, "rgba(0,0,0,0)");
   ctx.globalCompositeOperation = "destination-in";
-  ctx.fillStyle = h;
+  ctx.fillStyle = hgrad;
   ctx.fillRect(0, 0, s, s);
-
-  // carve the bare "M" out of the band → negative space
   ctx.globalCompositeOperation = "destination-out";
   ctx.lineWidth = s * 0.14;
   ctx.lineJoin = "miter";
@@ -57,28 +69,32 @@ function makeSignalTexture(): THREE.CanvasTexture {
   ctx.lineTo(xR, yTop);
   ctx.lineTo(xR, yBot);
   ctx.stroke();
-
   return new THREE.CanvasTexture(canvas);
 }
 
-// Eased oscillation with edge dwell: a triangle wave shaped by smootherstep, so the
-// beam decelerates and lingers at the extremes of its arc (hypnotic), not a linear
-// sweep. Returns -1..1.
+// Eased oscillation with edge dwell — lingers at the arc extremes (hypnotic).
 function edgeDwell(phase: number): number {
   const tri = 1 - Math.abs(2 * (phase - Math.floor(phase)) - 1);
   const s = tri * tri * tri * (tri * (tri * 6 - 15) + 10);
   return s * 2 - 1;
 }
 
-const PERIOD = 14; // s — slow, hypnotic loop
-const ARC = 0.55; // rad — half-swing of the beam
-const FROZEN_SWING = 0.18; // poster: a near-vertical clean shaft
+const PERIOD = 14; // s
+const ARC = 0.4; // rad — half-swing
+const FROZEN_SWING = 0.14; // poster: near-vertical
 
+// pivot sits on the beacon-tower roof (centre): tower h=8 at base y=-3 → roof y=5.
 export function Searchlight({ frozen = false }: { frozen?: boolean }) {
   const pivot = useRef<THREE.Group>(null);
   const signal = useRef<THREE.Sprite>(null);
+  const beam = useMemo(() => makeBeamTexture(), []);
   const tex = useMemo(() => makeSignalTexture(), []);
-  useEffect(() => () => tex.dispose(), [tex]);
+  useEffect(() => {
+    return () => {
+      beam.dispose();
+      tex.dispose();
+    };
+  }, [beam, tex]);
 
   const setSignal = (v: number) => {
     if (signal.current) (signal.current.material as THREE.SpriteMaterial).opacity = v;
@@ -95,45 +111,33 @@ export function Searchlight({ frozen = false }: { frozen?: boolean }) {
     const phase = (state.clock.elapsedTime / PERIOD) % 1;
     const swing = edgeDwell(phase) * ARC;
     p.rotation.z = swing;
-    // the M reads strongest where the beam crests (extremes of the arc)
-    const crest = Math.min(1, Math.abs(swing) / ARC);
-    setSignal(0.16 + crest * 0.4);
+    setSignal(0.2 + Math.min(1, Math.abs(swing) / ARC) * 0.4);
   });
 
   return (
-    <group ref={pivot} position={[5, 6, -1]}>
-      {/* nested cones, tip at the source (bottom) widening up into the sky.
-          core = bright shaft; mid + outer = volumetric falloff. */}
-      <mesh position={[0, 7, 0]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[1.4, 14, 48, 1, true]} />
+    <group ref={pivot} position={[0, 6, 0]}>
+      {/* defined shaft — short + wide cones so the beam spreads in-frame; the
+          gradient makes it brightest at the tower roof, fading into the sky. */}
+      <mesh position={[0, 4.5, 0]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[2.8, 9, 48, 1, true]} />
         <meshBasicMaterial
+          map={beam}
           color={SIGNAL}
           transparent
-          opacity={0.22}
+          opacity={0.9}
           blending={THREE.AdditiveBlending}
           side={THREE.DoubleSide}
           depthWrite={false}
           toneMapped={false}
         />
       </mesh>
-      <mesh position={[0, 7, 0]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[2.8, 14, 40, 1, true]} />
+      <mesh position={[0, 4.5, 0]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[5, 9, 36, 1, true]} />
         <meshBasicMaterial
+          map={beam}
           color={SIGNAL}
           transparent
-          opacity={0.08}
-          blending={THREE.AdditiveBlending}
-          side={THREE.DoubleSide}
-          depthWrite={false}
-          toneMapped={false}
-        />
-      </mesh>
-      <mesh position={[0, 7, 0]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[4.3, 14, 32, 1, true]} />
-        <meshBasicMaterial
-          color={SIGNAL}
-          transparent
-          opacity={0.035}
+          opacity={0.3}
           blending={THREE.AdditiveBlending}
           side={THREE.DoubleSide}
           depthWrite={false}
@@ -141,8 +145,8 @@ export function Searchlight({ frozen = false }: { frozen?: boolean }) {
         />
       </mesh>
 
-      {/* the projected "M" — high in the beam, billboarded, carved as negative space */}
-      <sprite ref={signal} position={[0, 1.2, 0]} scale={[4.5, 5, 1]}>
+      {/* projected "M" — upper-centre, in the beam, carved as negative space */}
+      <sprite ref={signal} position={[0, 1.5, 0]} scale={[4.5, 5, 1]}>
         <spriteMaterial
           map={tex}
           color={SIGNAL}

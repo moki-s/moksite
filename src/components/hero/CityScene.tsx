@@ -32,8 +32,9 @@ function makeWindowTexture(): THREE.CanvasTexture {
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
       const lit = rng() < 0.08;
-      // dimmer than before so the searchlight stays the dominant warm light (§4)
-      ctx.globalAlpha = lit ? 0.38 + rng() * 0.28 : 1;
+      // lit windows restored to a livelier glow (buildings pass) — the beam is
+      // still the dominant warm light by scale; these read as a living city.
+      ctx.globalAlpha = lit ? 0.5 + rng() * 0.3 : 1;
       ctx.fillStyle = lit ? "#f5a623" : "#0e1320";
       ctx.fillRect(x * 16 + 4, y * 16 + 5, 8, 9);
     }
@@ -65,9 +66,14 @@ function City({ texture }: { texture: THREE.Texture }) {
         const h = 1.6 + rng() * 5.4;
         const d = 0.8 + rng() * 0.6;
         const x = -spread / 2 + (i / (row.n - 1)) * spread + (rng() - 0.5) * 1.4;
-        out.push({ pos: [x, h / 2, row.z + (rng() - 0.5) * 1.4], scale: [w, h, d] });
+        // drop the skyline (size/heights unchanged) so the beam source clears the
+        // rooftops and the projected M sits bright in open sky.
+        out.push({ pos: [x, h / 2 - 3, row.z + (rng() - 0.5) * 1.4], scale: [w, h, d] });
       }
     }
+    // beacon tower — the searchlight rises from its roof (centre, mid-depth); it
+    // stands above the skyline so the beam clearly "comes from a building".
+    out.push({ pos: [0, 9 / 2 - 3, 0], scale: [2.2, 9, 2.2] });
     return out;
   }, []);
 
@@ -138,7 +144,7 @@ export default function CityScene({
       onCreated={() => onCreated?.()}
     >
       <color attach="background" args={["#0b0e13"]} />
-      <fog attach="fog" args={["#0b0e13", 8, 30]} />
+      <fog attach="fog" args={["#0b0e13", 8, 28]} />
       <Scene frozen={frozen} />
     </Canvas>
   );
