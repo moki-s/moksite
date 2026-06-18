@@ -136,6 +136,10 @@ export function HeroGate() {
 
       {show3D && <Lightning />}
 
+      {/* §4.5 — static theatrical vignette (translucent --ink, no new hue, no
+          motion); sits above the scene, below the overlay, on 3D + poster paths. */}
+      <div className="hero-vignette" aria-hidden="true" />
+
       <button
         type="button"
         className="hero-skip"

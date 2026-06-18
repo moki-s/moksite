@@ -19,6 +19,9 @@ type AppState = {
   // §11 — hidden-object hunt; persisted so it survives navigating into a case.
   foundEvidence: string[];
   markFound: (id: string) => void;
+  // cursor torch on/off (persisted); off → props are camouflaged-visible instead.
+  flashlightEnabled: boolean;
+  toggleFlashlight: () => void;
 };
 
 export const useAppStore = create<AppState>()(
@@ -40,6 +43,9 @@ export const useAppStore = create<AppState>()(
             ? s
             : { foundEvidence: [...s.foundEvidence, id] },
         ),
+      flashlightEnabled: true,
+      toggleFlashlight: () =>
+        set((s) => ({ flashlightEnabled: !s.flashlightEnabled })),
     }),
     {
       name: "moksite-prefs",
@@ -47,6 +53,7 @@ export const useAppStore = create<AppState>()(
         motionPref: state.motionPref,
         highContrast: state.highContrast,
         foundEvidence: state.foundEvidence,
+        flashlightEnabled: state.flashlightEnabled,
       }),
     },
   ),

@@ -3,6 +3,23 @@
 Accepted deviations from the PRD and one-line justifications for anything that
 needs explaining (per CLAUDE.md / PRD §0.3). Newest first.
 
+## Noir mood pass (within §4 tokens)
+
+- **Deepened mood, zero new hues.** Static theatrical **vignettes** on the hero and
+  panels (inset translucent `--ink` `box-shadow` — a *shadow*, not a gradient),
+  **rain intensity** up (length 0.55→0.68, opacity 0.25→0.30; segment count stays
+  at the **400 cap**, §8), **grain** trimmed 0.035→0.03 (to the §4.5 3% cap). Panel
+  halftone was already at the §4.5 **6% cap** (unchanged).
+- **Held the brief's fog-densening + further window-dimming.** The city is
+  geometrically identical to the original (`h = 1.6 + rng()*5.4`, fog 8–30, camera
+  unchanged) but *reads* compressed because the windows were already dimmed and the
+  central beam dominates — thickening fog / dimming further would worsen that.
+  Deferred to the dedicated buildings pass.
+- **Reduced-motion (§9):** no new motion — vignettes/grain are static. **Amber
+  audit:** hero stays ≤ 2 prominent amber (searchlight beam+M + strapline); this
+  pass added no amber. Vignette = a deliberate, owner-approved use of translucent
+  `--ink` as a shadow (consistent with the CRT vignette already in the codebase).
+
 ## Hidden-object hunt + `vigilante` command
 
 - **Site-wide hover-to-spot game (§11).** 7 original-noir DOM hotspots (detective,
@@ -23,6 +40,14 @@ needs explaining (per CLAUDE.md / PRD §0.3). Newest first.
   fixed below the sticky-nav z-index.
 - **No new deps; persisted state guarded by a `useMounted()` hook** so SSR/first
   paint render the unfound state and there's no hydration mismatch.
+- **Props are genuinely hidden (flashlight reveal).** On desktop + motion, props
+  are invisible until a cursor-tracked **bone light pool** sweeps near them (props
+  fade in by distance; hovering collects). The torch is a soft radial light pool
+  (`mix-blend: screen`, GPU transform, rAF-throttled) active only while the hunt is
+  unfinished. Touch / reduced-motion / no-JS fall back to *camouflaged-visible*
+  props (faint, ~0.4) so they stay findable. The torch + per-prop reveal are a
+  deliberate **§4.1 "no gradients" deviation** (a light effect, not a UI gradient);
+  **cool bone** keeps §4 "amber is earned" intact (owner-approved).
 
 ## Searchlight polish — cinematic beam + projected "M"
 

@@ -172,7 +172,7 @@ html.no-motion .hero-caption {
   inset: 0;
   z-index: 80;
   pointer-events: none;
-  opacity: 0.035;
+  opacity: 0.03;
 }
 .grain-svg {
   width: 100%;
@@ -295,6 +295,8 @@ html.no-motion .hero-caption {
   background-color: var(--midnight);
   border: 5px solid var(--bone);
   overflow: hidden;
+  /* theatrical edge vignette — translucent --ink shadow (no new hue) */
+  box-shadow: inset 0 0 160px 30px color-mix(in srgb, var(--ink) 55%, transparent);
 }
 @media (min-width: 768px) {
   .panel {
@@ -873,6 +875,13 @@ html.no-motion .hero-caption {
 .hero-canvas.is-loaded {
   opacity: 1;
 }
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 2; /* above poster/canvas (0/1), below the overlay (10) */
+  pointer-events: none;
+  box-shadow: inset 0 0 180px 55px color-mix(in srgb, var(--ink) 78%, transparent);
+}
 
 /* §5.1 fallback — animated CSS rain on the poster when 3D can't run but motion
    is on (reduced motion shows neither, via html.no-motion below) */
@@ -1331,11 +1340,22 @@ html.high-contrast *::after {
   pointer-events: auto;
   cursor: pointer;
   color: color-mix(in srgb, var(--rain) 55%, transparent);
-  opacity: 0.5;
+  /* fallback (touch / no-JS / reduced-motion): faintly visible so it stays findable */
+  opacity: 0.4;
   transition:
     color 0.2s ease-out,
-    opacity 0.2s ease-out,
+    opacity 0.18s ease-out,
     filter 0.2s ease-out;
+}
+/* desktop + motion: hidden until the flashlight (JS sets --reveal) sweeps near */
+html.motion .evidence-layer[data-flashlight] .evidence-prop {
+  opacity: var(--reveal, 0);
+}
+@media (pointer: coarse) {
+  /* touch has no cursor to sweep → keep them camouflaged-visible */
+  html.motion .evidence-layer[data-flashlight] .evidence-prop {
+    opacity: 0.4;
+  }
 }
 .evidence-art,
 .evidence-art svg {
@@ -1346,7 +1366,7 @@ html.high-contrast *::after {
 .evidence-prop:hover,
 .evidence-prop:focus-visible {
   color: var(--signal);
-  opacity: 1;
+  opacity: 1 !important; /* always reveal on hover/focus, over the flashlight base */
   filter: drop-shadow(0 0 6px color-mix(in srgb, var(--signal) 70%, transparent));
 }
 .evidence-prop:focus-visible {
@@ -1355,7 +1375,7 @@ html.high-contrast *::after {
 }
 .evidence-prop[data-found] {
   color: color-mix(in srgb, var(--signal) 60%, transparent);
-  opacity: 0.7;
+  opacity: 0.55 !important; /* collected props stay faintly visible regardless of the flashlight */
   cursor: default;
 }
 .evidence-stamp {
@@ -1376,23 +1396,33 @@ html.high-contrast *::after {
     transform: translateX(-50%) scale(0.85);
   }
 }
-/* a faint flicker lures the eye to the lit-window / neon props (unfound only) */
-.evidence-prop--window:not([data-found]) .evidence-art,
-.evidence-prop--neon:not([data-found]) .evidence-art {
-  animation: evidence-flicker 4.5s steps(1, end) infinite;
+/* (the flicker "lure" was removed — props are now hidden, revealed by the flashlight) */
+
+/* §11 cursor torch — a soft cool-bone light pool that lightens the scene (screen
+   blend) and follows the cursor via a GPU transform. Deliberate §4.1 deviation
+   (a light effect, not a UI gradient); neutral bone keeps "amber is earned". */
+.flashlight {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 22rem;
+  height: 22rem;
+  margin: -11rem 0 0 -11rem; /* centre the circle on the cursor coordinates */
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: var(--z-stamp); /* above content, below sticky nav + terminal */
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--bone) 18%, transparent) 0%,
+    transparent 68%
+  );
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
 }
-@keyframes evidence-flicker {
-  0%,
-  90%,
-  100% {
-    opacity: 1;
-  }
-  92% {
-    opacity: 0.35;
-  }
-  95% {
-    opacity: 0.9;
-  }
+html.no-motion .flashlight {
+  display: none;
 }
 
 /* §11 corner tally */

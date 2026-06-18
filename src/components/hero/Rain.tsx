@@ -4,8 +4,9 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
-// §5.1 / §8 — GPU-instanced rain, ≤ 400 short segments, opacity 0.25, cycling
-// downward. One InstancedMesh; matrices updated per frame.
+// §5.1 / §8 — GPU-instanced rain, ≤ 400 short segments (at the cap), cycling
+// downward. One InstancedMesh; matrices updated per frame. Intensity (length +
+// opacity) bumped for drama; segment count stays at the 400 budget.
 const COUNT = 400;
 
 export function Rain() {
@@ -50,8 +51,8 @@ export function Rain() {
 
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, COUNT]} frustumCulled={false}>
-      <boxGeometry args={[0.015, 0.55, 0.015]} />
-      <meshBasicMaterial color="#8a93a6" transparent opacity={0.25} toneMapped={false} />
+      <boxGeometry args={[0.015, 0.68, 0.015]} />
+      <meshBasicMaterial color="#8a93a6" transparent opacity={0.3} toneMapped={false} />
     </instancedMesh>
   );
 }

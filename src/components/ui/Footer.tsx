@@ -1,5 +1,6 @@
 import { siteConfig } from "@/content/site";
 import { MotionToggle } from "@/components/ui/MotionToggle";
+import { FlashlightToggle } from "@/components/ui/FlashlightToggle";
 import { TerminalHint } from "@/components/terminal/TerminalHint";
 
 // §6.4 — footer copy verbatim + the always-plain contact lines + MOTION toggle.
@@ -30,6 +31,7 @@ export function Footer() {
           </p>
           <div className="footer-controls">
             <TerminalHint />
+            <FlashlightToggle />
             <MotionToggle />
           </div>
         </div>
