@@ -4,6 +4,8 @@ import { join } from "node:path";
 import { siteConfig } from "@/content/site";
 
 // §10 — default OG card for the site (home and any route without its own image).
+// Emit at build time (required by `output: export`; harmless for server builds).
+export const dynamic = "force-static";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt = "moksite — a noir comic-book portfolio";

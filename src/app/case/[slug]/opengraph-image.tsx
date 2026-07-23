@@ -5,6 +5,8 @@ import { getAllCases, getCaseFrontmatter } from "@/lib/content";
 import { siteConfig } from "@/content/site";
 
 // §10 — branded per-case OG card: ink bg, Anton title, mono metadata, amber rule.
+// Emit at build time (required by `output: export`; harmless for server builds).
+export const dynamic = "force-static";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt = "moksite — case file";

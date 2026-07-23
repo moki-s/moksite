@@ -2,6 +2,9 @@ import type { MetadataRoute } from "next";
 import { getAllCases } from "@/lib/content";
 import { absoluteUrl } from "@/lib/seo";
 
+// Emit at build time (required by `output: export`; harmless for server builds).
+export const dynamic = "force-static";
+
 // §10 — all static routes + cases. Calling getAllCases() here means content
 // validation runs during `next build` (bad frontmatter fails the build).
 export default function sitemap(): MetadataRoute.Sitemap {

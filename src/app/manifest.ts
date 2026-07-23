@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/content/site";
 
+// Emit at build time (required by `output: export`; harmless for server builds).
+export const dynamic = "force-static";
+
 // PWA manifest — colours from the §4 tokens, icons from the stamp motif.
 export default function manifest(): MetadataRoute.Manifest {
   return {
