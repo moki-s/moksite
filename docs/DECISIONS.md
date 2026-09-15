@@ -3,6 +3,67 @@
 Accepted deviations from the PRD and one-line justifications for anything that
 needs explaining (per CLAUDE.md / PRD §0.3). Newest first.
 
+## Finalisation — Vercel target, CV, case order, owner-shown data (16 Sep 2026)
+
+- **Deploy target is Vercel (supersedes the Phase 0 "deploy deferred" + the GitHub
+  Pages workflow).** The app has a server route (`/api/contact`), which static Pages
+  can't run — the Pages workflow deleted `src/app/api` and degraded the form to
+  `mailto`. Removed `.github/workflows/deploy.yml`; the full server feature set
+  (contact email, §7.6 headers + CSP) now ships. `NEXT_PUBLIC_SITE_URL` must be set
+  in Vercel env or OG/sitemap/canonical fall back to `localhost` (see README).
+- **CV supplied (interim).** `public/cv.pdf` added so the `cv` command, footer,
+  `/dossier` and contact CTA resolve. Owner will replace with a final CV later.
+- **Visible cases renumbered 1–3.** `order` set to 1 (Learning Machine), 2
+  (Conversion Engine), 3 (Stance) after the two hidden cases were pulled, so the
+  splash reads CASE 001/002/003 with no gaps.
+- **Conversion Engine evidence shown un-redacted (owner-directed).** At the owner's
+  explicit instruction ("show as is… they are only names"), the Reports and Pipeline
+  shots display real lead + agent names. The CRM dashboard keeps its revenue figure
+  blurred (§A.6). ⚠️ These are real third-party names (the employer's leads); the
+  owner accepted this before public deploy — GDPR/consent is the owner's call. The
+  Pipeline shot also shows the internal `crm.integertraining.com` URL in the browser
+  chrome (offered to crop; owner chose to keep as-is).
+
+## Content pass — portrait, case imagery, hidden cases (15 Sep 2026)
+
+- **Origin portrait supplied.** A real photo, treated to the §5.3 spec — ink/bone
+  **duotone** via an inline SVG filter (grayscale → shadows=`--ink`, highlights=
+  `--bone`), pre-desaturated and compressed to 157 KB webp (§8 ≤200 KB), with a
+  theatrical inset-`--ink` vignette (a shadow, not a gradient). Replaces the
+  `PORTRAIT` placeholder in `Origin.tsx`.
+- **Case imagery = real product screenshots, redacted.** Cases 1, 4 and 5 now ship
+  real cover + evidence shots (Pearl LMS, Pearl CRM, Stance Health). All PII —
+  learner/lead/patient names, emails, phone numbers, staff/consultant names — is
+  **blurred** (sharp: extract region → gaussian blur σ18–26 → composite at full
+  res, then downscale). Employer aggregate financials are blurred too, per §A.6
+  (relative-framed revenue). Images are webp, 14–67 KB each (well under §8). No
+  fabricated UI: where a screen was confidential the case would run copy-only —
+  none needed that here.
+- **webp, not avif.** §6.1's comment shows `cover.avif`; shots ship as `.webp`
+  (schema is `z.string()`, only existence is enforced). webp is smaller here and
+  universally supported; avif conversion can happen in the final asset pass.
+- **Two cases hidden pending replacement (owner direction).** `the-dictation-job`
+  and `vibrant-lane` moved to `content/cases/_hidden/` — the loader only reads
+  top-level `.mdx`, so they vanish from the index, sitemap, dossier and their
+  detail routes 404. Files are preserved for the owner's replacements. The
+  CONTENT-TODO generator now skips `_hidden/` so drafts don't block the launch
+  gate. Remaining `[TODO-CONTENT]`: arsenal field-use lines + `whoami` bio only.
+- **Arsenal one-liners + `whoami` bio drafted by the agent (owner-directed).** §A.4
+  and the `site.ts` note reserve the noir "field-use" voice for the owner ("the
+  agent does not improvise copy-deck voice"). The owner explicitly directed the
+  agent to draft them "humanised and nice" (15 Sep 2026), which overrides that
+  default. Lines match the seeded voice ("SQL — gets confessions out of
+  databases."); the `whoami` bio uses only facts already in the origin copy / CV —
+  no fabrication. Owner to review/tweak. `CONTENT-TODO.md` now shows **zero** items.
+- **Case covers refreshed.** Case 1 (LMS) and Case 4 (CRM) covers swapped to the
+  cropped brand hero panels the owner supplied (cleaner than the full login
+  screenshots). Case 4's leads-table evidence shot replaced with the Reports &
+  Analytics screen (agent names redacted) at the owner's request.
+- **Stance dashboard shows a demo tenant (0 patients / ₹0).** The unified-dashboard
+  evidence shot is from a sandbox instance; the case's 1,700+ patients / 3 centres
+  live in the OUTCOME copy (real deployment). Flagged to owner — swap for the
+  branded sign-in shot if the empty state reads as inconsistent.
+
 ## Noir mood pass (within §4 tokens)
 
 - **Deepened mood, zero new hues.** Static theatrical **vignettes** on the hero and
