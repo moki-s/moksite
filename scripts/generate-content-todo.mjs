@@ -12,7 +12,9 @@ const ROOT = process.cwd();
 const MARKER = "[TODO-CONTENT]";
 const SCAN_DIRS = ["content", "src/content", "src/app"];
 const EXTS = new Set([".mdx", ".md", ".ts", ".tsx"]);
-const SKIP_DIRS = new Set(["node_modules", ".next", ".git"]);
+// `_hidden` holds cases pulled from the build (drafts awaiting replacement) —
+// their markers must not block the launch gate until they're restored.
+const SKIP_DIRS = new Set(["node_modules", ".next", ".git", "_hidden"]);
 
 function walk(dir, acc = []) {
   if (!fs.existsSync(dir)) return acc;
