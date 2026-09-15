@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Panel } from "@/components/panels/Panel";
 import { CaptionBox } from "@/components/panels/CaptionBox";
 import { EvidenceLayerLazy } from "@/components/game/EvidenceLayerLazy";
@@ -23,13 +24,30 @@ export function Origin() {
           <p className="origin-signoff">{siteConfig.name}</p>
           <p className="origin-role">{siteConfig.role}</p>
         </div>
-        <div
-          className="origin-portrait"
-          role="img"
-          aria-label="Portrait placeholder — an ink-treated photo is supplied before launch."
-        >
-          <span>PORTRAIT</span>
-        </div>
+        <figure className="origin-portrait">
+          <Image
+            src="/images/portrait.webp"
+            alt={`${siteConfig.name} — ${siteConfig.role}`}
+            fill
+            sizes="(max-width: 760px) 100vw, 360px"
+            className="origin-portrait-img"
+          />
+          {/* §5.3 — ink/bone duotone treatment of a real photo (original artwork,
+              not traced). Maps grayscale shadows→--ink, highlights→--bone. */}
+          <svg className="origin-duotone-def" aria-hidden="true" focusable="false">
+            <filter id="ink-duotone" colorInterpolationFilters="sRGB">
+              <feColorMatrix
+                type="matrix"
+                values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 1 0"
+              />
+              <feComponentTransfer>
+                <feFuncR type="table" tableValues="0.043 0.910" />
+                <feFuncG type="table" tableValues="0.055 0.894" />
+                <feFuncB type="table" tableValues="0.075 0.847" />
+              </feComponentTransfer>
+            </filter>
+          </svg>
+        </figure>
       </div>
       <EvidenceLayerLazy panel="origin" />
     </Panel>
