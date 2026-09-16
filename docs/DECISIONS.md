@@ -35,9 +35,10 @@ needs explaining (per CLAUDE.md / PRD §0.3). Newest first.
   in Vercel env or OG/sitemap/canonical fall back to `localhost` (see README).
 - **CV supplied (interim).** `public/cv.pdf` added so the `cv` command, footer,
   `/dossier` and contact CTA resolve. Owner will replace with a final CV later.
-- **Visible cases renumbered 1–3.** `order` set to 1 (Learning Machine), 2
-  (Conversion Engine), 3 (Stance) after the two hidden cases were pulled, so the
-  splash reads CASE 001/002/003 with no gaps.
+- **Visible cases renumbered (then 1–3; later reordered to 1–5 — see the top
+  entry).** After the two hidden cases were pulled, `order` was set to 1 (Learning
+  Machine), 2 (Conversion Engine), 3 (Stance). Adding two new cases and a reorder
+  later changed this; the current 1–5 order lives in the "New cases" entry above.
 - **Conversion Engine evidence shown un-redacted (owner-directed).** At the owner's
   explicit instruction ("show as is… they are only names"), the Reports and Pipeline
   shots display real lead + agent names. The CRM dashboard keeps its revenue figure
@@ -53,8 +54,9 @@ needs explaining (per CLAUDE.md / PRD §0.3). Newest first.
   `--bone`), pre-desaturated and compressed to 157 KB webp (§8 ≤200 KB), with a
   theatrical inset-`--ink` vignette (a shadow, not a gradient). Replaces the
   `PORTRAIT` placeholder in `Origin.tsx`.
-- **Case imagery = real product screenshots, redacted.** Cases 1, 4 and 5 now ship
-  real cover + evidence shots (Pearl LMS, Pearl CRM, Stance Health). All PII —
+- **Case imagery = real product screenshots, redacted.** The Learning Machine, The
+  Conversion Engine and Stance now ship real cover + evidence shots (Pearl LMS,
+  Pearl CRM, Stance Health). All PII —
   learner/lead/patient names, emails, phone numbers, staff/consultant names — is
   **blurred** (sharp: extract region → gaussian blur σ18–26 → composite at full
   res, then downscale). Employer aggregate financials are blurred too, per §A.6
@@ -77,10 +79,11 @@ needs explaining (per CLAUDE.md / PRD §0.3). Newest first.
   default. Lines match the seeded voice ("SQL — gets confessions out of
   databases."); the `whoami` bio uses only facts already in the origin copy / CV —
   no fabrication. Owner to review/tweak. `CONTENT-TODO.md` now shows **zero** items.
-- **Case covers refreshed.** Case 1 (LMS) and Case 4 (CRM) covers swapped to the
-  cropped brand hero panels the owner supplied (cleaner than the full login
-  screenshots). Case 4's leads-table evidence shot replaced with the Reports &
-  Analytics screen (agent names redacted) at the owner's request.
+- **Case covers refreshed.** The Learning Machine (LMS) and The Conversion Engine
+  (CRM) covers swapped to the cropped brand hero panels the owner supplied (cleaner
+  than the full login screenshots). The Conversion Engine's leads-table evidence
+  shot was replaced with the Reports & Analytics screen (agent names later shown
+  un-redacted — see the Finalisation entry) at the owner's request.
 - **Stance dashboard shows a demo tenant (0 patients / ₹0).** The unified-dashboard
   evidence shot is from a sandbox instance; the case's 1,700+ patients / 3 centres
   live in the OUTCOME copy (real deployment). Flagged to owner — swap for the
