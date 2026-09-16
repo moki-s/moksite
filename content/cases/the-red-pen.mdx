@@ -1,0 +1,43 @@
+---
+title: "The Red Pen"
+slug: "the-red-pen"
+order: 3
+year: 2026
+role: "Product owner & builder"
+status: "shipped"
+stack:
+  - "Claude Code"
+  - "LLM integration"
+  - "Prompt engineering"
+  - "DeepSeek"
+  - "OpenAI"
+  - "Supabase"
+summary: "The AI marker that cut assignment marking from 60 minutes to 20."
+metrics:
+  - label: "per assignment"
+    value: "60 → 20 min"
+  - label: "marking time cut"
+    value: "−67%"
+  - label: "AI cost / marking"
+    value: "~$0.03"
+links: {}
+cover: "/images/cases/the-red-pen/cover.webp"
+images:
+  - src: "/images/cases/the-red-pen/submissions.webp"
+    alt: "AI marking queue — learner submissions across tutors and courses with AI review status"
+    caption: "Every submission tracked from awaiting-AI to marked, with a human review queue."
+  - src: "/images/cases/the-red-pen/courses.webp"
+    alt: "A qualification imported from its specification PDF — 23 units parsed with confidence scoring"
+    caption: "The training database: qualification specs imported unit by unit."
+  - src: "/images/cases/the-red-pen/unit.webp"
+    alt: "A unit's learning outcomes and assessment criteria, AI-drafted from the spec for marking"
+    caption: "The learning outcomes and assessment criteria the marker grades against."
+---
+
+## THE BRIEF
+
+Tutors were spending about an hour marking each assignment by hand against dense qualification criteria — and it only got slower as enrolments grew.
+
+## THE OPERATION
+
+Designed an AI marking tool end to end: defined the prompting approach and built the training database by importing each qualification's specification — learning outcomes and assessment criteria, unit by unit — then led testing across providers (DeepSeek, OpenAI) behind daily cost caps and a human review queue for low-confidence results. Automated learner enrolment form-filling along the way. Marking dropped from 60 minutes to 20 per assignment.
