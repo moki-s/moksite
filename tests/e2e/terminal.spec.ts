@@ -36,6 +36,7 @@ test("terminal chunk is lazy — no dialog or chunk until discovery", async ({ p
 test("keyboard-only: commands, history, tab-complete, clear", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
+  await page.waitForLoadState("networkidle"); // let WebKit attach the backtick handler
   await page.keyboard.press("`");
   await expect(page.locator(DIALOG)).toBeVisible();
   await expect(page.locator("#terminal-input")).toBeVisible(); // boot done (input renders on `booted`)
@@ -80,6 +81,7 @@ test("keyboard-only: commands, history, tab-complete, clear", async ({ page }) =
 test("cases + open <slug> navigates to the case file (§12)", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
+  await page.waitForLoadState("networkidle"); // let WebKit attach the backtick handler
   await page.keyboard.press("`");
   await expect(page.locator(DIALOG)).toBeVisible();
   await expect(page.locator("#terminal-input")).toBeVisible(); // boot done (input renders on `booted`)
@@ -97,6 +99,7 @@ test("cases + open <slug> navigates to the case file (§12)", async ({ page }) =
 test("Esc always closes and restores focus to the trigger", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
+  await page.waitForLoadState("networkidle"); // hydration before keyboard activation
   const hotspot = page.getByRole("button", {
     name: "A lit window. Something hums inside.",
   });
