@@ -60,7 +60,7 @@ test("no console errors on a case page", async ({ page }) => {
     if (m.type() === "error") errors.push(m.text());
   });
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto("/case/the-dictation-job");
+  await page.goto("/case/the-red-pen");
   await page.waitForTimeout(600);
   expect(errors, errors.join("\n")).toEqual([]);
 });
