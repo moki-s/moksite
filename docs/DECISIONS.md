@@ -3,6 +3,28 @@
 Accepted deviations from the PRD and one-line justifications for anything that
 needs explaining (per CLAUDE.md / PRD §0.3). Newest first.
 
+## New cases — AI marking + email engine, reorder (16 Sep 2026)
+
+- **Two cases added from the draft CV** (`Integer_CV_Update.pdf`): **The Red Pen**
+  (AI marking tool — "reduced assignment marking from 60 to 20 minutes", CV bullet 4)
+  and **The Dispatch** (Amazon SES email engine — "10,000+ marketing emails/day",
+  bullet 5). Copy drawn from the CV; screenshots used **as-is** per owner direction
+  ("use as-is unless very sensitive"). The one exception: the AI-marking submissions
+  shot has **student + tutor names blurred** (educational records — the agent's
+  recommended override of "as-is", owner-approved).
+- **Case order (owner-directed):** Conversion Engine (001), Stance (002), Red Pen
+  (003), Dispatch (004), Learning Machine (005). The LMS was moved to the end pending
+  the owner's decision on it (owner: "leave as is for now, figure it out later").
+- **Existing copy/metrics deliberately NOT refreshed.** The newer draft-CV figures
+  (CRM 30,000+ leads; ePearl Academy 1,000+ learners on ClassroomIO; etc.) are not
+  applied yet — owner will update them, and the downloadable `cv.pdf`, when the final
+  CV lands.
+- **Titles** ("The Red Pen", "The Dispatch") are agent-picked noir names — owner to
+  confirm/rename.
+- **E2E fix:** `tests/e2e/cases.spec.ts` smoke-tested `/case/the-dictation-job`, now
+  hidden (404) — repointed to `/case/the-red-pen`. Terminal `cases`/`open` are
+  data-driven, so they picked up the new cases with no change.
+
 ## Finalisation — Vercel target, CV, case order, owner-shown data (16 Sep 2026)
 
 - **Deploy target is Vercel (supersedes the Phase 0 "deploy deferred" + the GitHub

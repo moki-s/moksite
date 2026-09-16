@@ -35,8 +35,10 @@ shows **zero** open items).
   awaiting a rewrite sit in `content/cases/_hidden/` — the loader only reads
   top-level `.mdx`, so they don't appear anywhere and their routes 404.
 - Typed site content (name, socials, arsenal, `whoami` bio) is `src/content/site.ts`.
-- Screenshots are stored pre-optimised in `public/images/` (webp, ≤200 KB each);
-  any third-party PII is blurred at rest before commit.
+- Screenshots are stored pre-optimised in `public/images/` (webp, ≤200 KB each).
+  Sensitive third-party PII (student/learner records, financial figures) is blurred
+  at rest; some operational names are shown as-is at the owner's direction — see
+  `docs/DECISIONS.md`.
 
 ## Deploy (Vercel)
 
