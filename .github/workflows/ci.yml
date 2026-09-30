@@ -43,11 +43,34 @@ jobs:
         run: |
           pnpm start &
           for i in $(seq 1 30); do curl -sf http://localhost:3000 >/dev/null 2>&1 && break; sleep 1; done
+          # Calibrate lantern's CPU multiplier to THIS runner's measured speed so the
+          # simulated mid-tier phone is identical across the (highly variable) shared
+          # runner fleet. Formula = the official Lighthouse calculator
+          # (GoogleChrome/lighthouse docs/throttling.md): bi 1533→4x · 800→2x · 150→1x.
+          # Without this, identical commits scored medians 0.83 vs 0.60 on different
+          # runners (see docs/DECISIONS.md, 30 Sep 2026).
+          LH_CLI=$(ls node_modules/.pnpm/lighthouse@*/node_modules/lighthouse/cli/index.js | head -1)
+          node "$LH_CLI" http://localhost:3000/ --only-categories=seo --throttling-method=provided \
+            --chrome-flags="--no-sandbox" --output=json --output-path=./bi-probe.json --quiet || true
+          MULT=$(node -e "
+            try {
+              const bi = require('./bi-probe.json').environment.benchmarkIndex;
+              let m;
+              if (bi >= 1300) m = 3 + (bi - 1300) / 233;
+              else if (bi >= 800) m = 2 + (bi - 800) / 500;
+              else if (bi >= 150) m = 1 + (bi - 150) / 650;
+              else m = 1;
+              console.log(Math.max(1, Math.min(4, m)).toFixed(2) + ' ' + Math.round(bi));
+            } catch (e) { console.log('4.00 unknown'); }
+          ")
+          echo \"runner benchmarkIndex + calibrated cpuSlowdownMultiplier: $MULT\"
           set -o pipefail
-          if ! pnpm exec lhci autorun --config=./lighthouserc.json --collect.startServerCommand="" 2>&1 | tee lhci-output.txt; then
+          if ! pnpm exec lhci autorun --config=./lighthouserc.json --collect.startServerCommand="" \
+            --collect.settings.throttling.cpuSlowdownMultiplier="${MULT%% *}" 2>&1 | tee lhci-output.txt; then
             # surface the assertion detail as a public annotation + step summary
             # (the raw job log requires repo auth to download)
-            DETAIL=$(tail -60 lhci-output.txt | tr -d '\r')
+            DETAIL="calibration (multiplier benchmarkIndex): $MULT
+          $(tail -60 lhci-output.txt | tr -d '\r')"
             echo "## Lighthouse CI failure" >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
             echo "$DETAIL" >> "$GITHUB_STEP_SUMMARY"

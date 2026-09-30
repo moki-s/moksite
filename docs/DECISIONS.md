@@ -129,7 +129,20 @@ unchanged (screenshot-diffed at 1280/1440).
   slowdown swung 864→1627 ms between runs on identical code). If the gate still
   fails persistently, the next lever is the Phase-5-deferred gsap/lenis
   lazy-load (~30 KB off the initial bundle → direct TBT cut) — not attempted in
-  this pass.
+  this pass. **Update (runs #34–#35):** median-of-3 alone was insufficient —
+  identical code scored medians **0.83** then **0.60** on different runners
+  (whole distributions shifted; fleet hardware variance, not code). Fix: CI now
+  **calibrates lantern's `cpuSlowdownMultiplier` to each runner's measured
+  `benchmarkIndex`** using the official Lighthouse formula
+  (GoogleChrome/lighthouse `docs/throttling.md` + the team's calculator:
+  bi 1533→4×, 800→2×, 150→1×), via a fast unthrottled probe run before lhci.
+  This pins the simulated mid-tier phone to a constant device regardless of
+  host speed — calibrating the instrument, NOT relaxing the §2 budget (the
+  0.85 gate is unchanged, and local fast-host runs at the default 4× remain
+  the reference: home 0.94–0.95). Also in this pass: the mobile ink-stamp
+  enters from scale 0.95 instead of 1.05 (a from-above scale paints the h1
+  larger at hydration and can re-register a late LCP entry; desktop keeps
+  1.05).
 - **No new dependencies** (§7.2 check: everything uses existing
   gsap/lenis/r3f/three/zustand/playwright/sharp).
 
