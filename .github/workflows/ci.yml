@@ -71,9 +71,27 @@ jobs:
             --collect.settings.throttling.cpuSlowdownMultiplier="${MULT%% *}" 2>&1 | tee lhci-output.txt; then
             # surface the assertion detail as a public annotation + step summary
             # (the raw job log requires repo auth to download)
+            AUDITS=$(node -e "
+              const fs = require('fs');
+              for (const f of fs.readdirSync('lhci-report')) {
+                if (!f.endsWith('.json')) continue;
+                try {
+                  const r = JSON.parse(fs.readFileSync('lhci-report/' + f, 'utf8'));
+                  if (!r.categories) continue;
+                  const a = (id) => Math.round(r.audits[id]?.numericValue ?? -1);
+                  const el = r.audits['largest-contentful-paint-element']?.details?.items?.[0]?.items?.[0]?.node?.snippet ?? '';
+                  console.log(r.finalDisplayedUrl, 'perf', r.categories.performance?.score,
+                    'FCP', a('first-contentful-paint'), 'SI', a('speed-index'),
+                    'LCP', a('largest-contentful-paint'), 'TBT', a('total-blocking-time'),
+                    'CLS', r.audits['cumulative-layout-shift']?.numericValue,
+                    'LCPel', JSON.stringify(el.slice(0, 80)));
+                } catch {}
+              }
+            " 2>&1)
             DETAIL="calibration (multiplier benchmarkIndex): $MULT
           probe stderr: $(tail -c 300 probe-err.txt 2>/dev/null)
-          $(tail -60 lhci-output.txt | tr -d '\r')"
+          $AUDITS
+          $(tail -40 lhci-output.txt | tr -d '\r')"
             echo "## Lighthouse CI failure" >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
             echo "$DETAIL" >> "$GITHUB_STEP_SUMMARY"
