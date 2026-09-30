@@ -49,9 +49,11 @@ jobs:
           # (GoogleChrome/lighthouse docs/throttling.md): bi 1533→4x · 800→2x · 150→1x.
           # Without this, identical commits scored medians 0.83 vs 0.60 on different
           # runners (see docs/DECISIONS.md, 30 Sep 2026).
-          LH_CLI=$(ls node_modules/.pnpm/lighthouse@*/node_modules/lighthouse/cli/index.js | head -1)
+          LH_CLI=$(find node_modules/.pnpm -path "*/lighthouse/cli/index.js" 2>/dev/null | head -1)
+          echo "probe cli: ${LH_CLI:-NOT FOUND}"
           node "$LH_CLI" http://localhost:3000/ --only-categories=seo --throttling-method=provided \
-            --chrome-flags="--no-sandbox" --output=json --output-path=./bi-probe.json --quiet || true
+            --chrome-flags="--no-sandbox --headless" --output=json --output-path=./bi-probe.json \
+            --quiet 2>probe-err.txt || echo "probe failed: $(tail -c 400 probe-err.txt)"
           MULT=$(node -e "
             try {
               const bi = require('./bi-probe.json').environment.benchmarkIndex;
@@ -70,6 +72,7 @@ jobs:
             # surface the assertion detail as a public annotation + step summary
             # (the raw job log requires repo auth to download)
             DETAIL="calibration (multiplier benchmarkIndex): $MULT
+          probe stderr: $(tail -c 300 probe-err.txt 2>/dev/null)
           $(tail -60 lhci-output.txt | tr -d '\r')"
             echo "## Lighthouse CI failure" >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
