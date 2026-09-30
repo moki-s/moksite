@@ -182,12 +182,21 @@ export function HeroGate() {
   // ink-stamp name entrance (§5.1) — motion only
   useIsomorphicLayoutEffect(() => {
     if (!motionEnabled || !nameRef.current) return;
+    // Scale direction matters for LCP: `from 1.05` paints the h1 5% LARGER at
+    // hydration time, which registers a new (late, ~hydration-time) LCP entry
+    // — the source of the historic ~3s lab LCP. On mobile the stamp enters
+    // from 0.95 instead (grows into place, never exceeding the SSR paint, so
+    // LCP stays at first paint). Desktop keeps the original 1.05 press-down.
+    const fromScale =
+      window.matchMedia("(pointer: fine)").matches && window.innerWidth >= 1024
+        ? 1.05
+        : 0.95;
     const ctx = gsap.context(() => {
       // Scale-only settle — no opacity gate. The <h1> is the LCP element, so it
       // must stay painted from first paint; animating autoAlpha would hide it
       // until hydration and push LCP past the §2 budget.
       gsap.from(nameRef.current, {
-        scale: 1.05,
+        scale: fromScale,
         duration: dur.enter.duration,
         ease: dur.enter.ease,
       });
