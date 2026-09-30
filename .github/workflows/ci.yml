@@ -47,7 +47,7 @@ jobs:
           if ! pnpm exec lhci autorun --config=./lighthouserc.json --collect.startServerCommand="" 2>&1 | tee lhci-output.txt; then
             # surface the assertion detail as a public annotation + step summary
             # (the raw job log requires repo auth to download)
-            DETAIL=$(grep -B1 -A5 -E "assertion for|Runtime error" lhci-output.txt | head -60 | tr -d '\r')
+            DETAIL=$(tail -60 lhci-output.txt | tr -d '\r')
             echo "## Lighthouse CI failure" >> "$GITHUB_STEP_SUMMARY"
             echo '```' >> "$GITHUB_STEP_SUMMARY"
             echo "$DETAIL" >> "$GITHUB_STEP_SUMMARY"
