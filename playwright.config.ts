@@ -10,7 +10,7 @@ export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: 0,
+  retries: process.env.CI ? 1 : 0, // shared-runner engine races (WebKit) — see DECISIONS.md
   workers: 1,
   // `github` on CI surfaces each failing test as a workflow annotation
   // (readable from the run page / checks API without downloading logs)

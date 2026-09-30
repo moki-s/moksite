@@ -1,6 +1,17 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 
 const DIALOG = '[role="dialog"][aria-label="Command Center"]';
+
+// WebKit attaches the global backtick handler only after hydration, and even
+// post-networkidle a single early press is sometimes dropped on slow CI
+// runners. Retry press→visible until it lands (extra presses after open would
+// just type into the input, but the loop stops at the first success).
+async function openWithBacktick(page: Page) {
+  await expect(async () => {
+    await page.keyboard.press("`");
+    await expect(page.locator(DIALOG)).toBeVisible({ timeout: 1500 });
+  }).toPass({ timeout: 15_000 });
+}
 
 test("terminal chunk is lazy — no dialog or chunk until discovery", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -27,8 +38,7 @@ test("terminal chunk is lazy — no dialog or chunk until discovery", async ({ p
   await page.waitForLoadState("networkidle"); // initial + prefetch chunks settle
 
   opened = true;
-  await page.keyboard.press("`");
-  await expect(page.locator(DIALOG)).toBeVisible();
+  await openWithBacktick(page);
   expect(after.length, "a new JS chunk loads on discovery").toBeGreaterThan(0);
   expect(errors, errors.join("\n")).toEqual([]);
 });
@@ -37,8 +47,7 @@ test("keyboard-only: commands, history, tab-complete, clear", async ({ page }) =
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await page.waitForLoadState("networkidle"); // let WebKit attach the backtick handler
-  await page.keyboard.press("`");
-  await expect(page.locator(DIALOG)).toBeVisible();
+  await openWithBacktick(page);
   await expect(page.locator("#terminal-input")).toBeVisible(); // boot done (input renders on `booted`)
 
   const input = page.locator("#terminal-input");
@@ -82,8 +91,7 @@ test("cases + open <slug> navigates to the case file (§12)", async ({ page }) =
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await page.waitForLoadState("networkidle"); // let WebKit attach the backtick handler
-  await page.keyboard.press("`");
-  await expect(page.locator(DIALOG)).toBeVisible();
+  await openWithBacktick(page);
   await expect(page.locator("#terminal-input")).toBeVisible(); // boot done (input renders on `booted`)
 
   const input = page.locator("#terminal-input");

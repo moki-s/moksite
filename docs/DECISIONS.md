@@ -104,7 +104,12 @@ unchanged (screenshot-diffed at 1280/1440).
   `matchMedia` and skip where an engine can't emulate it. One quirk: bagging a
   lit prop uses `page.touchscreen.tap` — the browser's own hit test targets the
   prop (verified), but `locator.tap()`'s hit-target pre-check false-positives on
-  the pointer-enabled layer wrapper.
+  the pointer-enabled layer wrapper. **CI stabilisation (runs #28–30 flaked on
+  the shared ubuntu runner):** the WebKit backtick-open race is now a
+  press→visible retry loop (`toPass`) instead of a single post-networkidle
+  press, Playwright gets `retries: 1` on CI only, failing tests are surfaced as
+  public annotations (github reporter), and the lhci step greps its assertion
+  output into an annotation + step summary on failure.
 - **No new dependencies** (§7.2 check: everything uses existing
   gsap/lenis/r3f/three/zustand/playwright/sharp).
 

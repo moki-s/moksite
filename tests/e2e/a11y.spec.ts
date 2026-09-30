@@ -36,10 +36,15 @@ test("dossier — no critical/serious a11y violations", async ({ page }) => {
 test("open terminal — no critical/serious a11y violations", async ({ page }) => {
   await page.goto("/");
   // Wait for hydration before the keypress — WebKit attaches the global
-  // backtick handler a beat later, and an early press is otherwise dropped.
+  // backtick handler a beat later, and an early press is otherwise dropped
+  // (even post-networkidle on slow CI runners — so retry press→visible).
   await page.waitForLoadState("networkidle");
-  await page.keyboard.press("`");
-  await expect(page.getByRole("dialog", { name: /command center/i })).toBeVisible();
+  await expect(async () => {
+    await page.keyboard.press("`");
+    await expect(
+      page.getByRole("dialog", { name: /command center/i }),
+    ).toBeVisible({ timeout: 1500 });
+  }).toPass({ timeout: 15_000 });
   // Drive to a fully-booted, stable state (boot animation done, output rendered)
   // so the scan never catches a transient mid-boot frame.
   const input = page.locator("#terminal-input");
