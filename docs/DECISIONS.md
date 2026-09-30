@@ -138,11 +138,24 @@ unchanged (screenshot-diffed at 1280/1440).
   bi 1533→4×, 800→2×, 150→1×), via a fast unthrottled probe run before lhci.
   This pins the simulated mid-tier phone to a constant device regardless of
   host speed — calibrating the instrument, NOT relaxing the §2 budget (the
-  0.85 gate is unchanged, and local fast-host runs at the default 4× remain
-  the reference: home 0.94–0.95). Also in this pass: the mobile ink-stamp
-  enters from scale 0.95 instead of 1.05 (a from-above scale paints the h1
-  larger at hydration and can re-register a late LCP entry; desktop keeps
-  1.05).
+  0.85 gate is unchanged). Also in this pass: the mobile ink-stamp enters from
+  scale 0.95 instead of 1.05 (a from-above scale paints the h1 larger at
+  hydration and can re-register a late LCP entry; desktop keeps 1.05).
+  **Resolution (runs #36–#38):** the calibration probe then reported
+  benchmarkIndex ≈ 2100–2500 — the runners were FAST, and per-audit
+  annotations showed home TBT ≈ 4,000 ms sim on CI vs ~20 ms locally.
+  Cold-profile reproduction (fresh Chrome profile, no compile caches — my
+  earlier local runs were flattered by a warm attach-mode Chrome) isolated a
+  genuine overhaul regression: the tier gate called `supportsWebGL2()`
+  unconditionally, and the baseline's `finePointer && … && supportsWebGL2()`
+  short-circuit had always protected phones from it — creating a WebGL2
+  context initialises the GL stack (~300 ms main-thread on software Chrome →
+  ~1.2 s simulated TBT at hydration, on every phone). Fixed: the capability
+  gate never probes GL for the mobile tier; the probe moved to arm time
+  (first interaction), falling back to the poster tier if WebGL2 is missing.
+  Cold home TBT 1516 → **59–96 ms**, cold perf 0.64 → **0.89–0.90** — equal
+  to the pre-overhaul baseline (0.89–0.90 / 61–94 ms) under identical cold
+  conditions. Real-device benefit: phones no longer pay GL init on page load.
 - **No new dependencies** (§7.2 check: everything uses existing
   gsap/lenis/r3f/three/zustand/playwright/sharp).
 

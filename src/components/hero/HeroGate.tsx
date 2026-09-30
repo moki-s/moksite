@@ -94,9 +94,13 @@ export function HeroGate() {
       typeof nav.hardwareConcurrency === "number" && nav.hardwareConcurrency < 4;
     const finePointer = window.matchMedia("(pointer: fine)").matches;
     const wideEnough = window.innerWidth >= 1024;
-    const webgl2 = supportsWebGL2();
 
-    if (!lowMem && !fewCores && finePointer && wideEnough && webgl2) {
+    // NOTE: supportsWebGL2() must stay LAST in the && chain and must NOT run
+    // for the mobile tier here — creating a WebGL2 context initialises the GL
+    // stack (SwiftShader on software Chrome: ~300ms of main thread) and doing
+    // it at hydration on phones cost ~1.2s of simulated TBT. The mobile tier
+    // probes it lazily at arm time instead (see the mount effect).
+    if (!lowMem && !fewCores && finePointer && wideEnough && supportsWebGL2()) {
       setTier("full"); // the unchanged desktop gate
       setPortrait(false);
       return;
@@ -106,7 +110,7 @@ export function HeroGate() {
     // are uniformly capable).
     const veryLowMem = typeof nav.deviceMemory === "number" && nav.deviceMemory < 2;
     const saveData = nav.connection?.saveData === true;
-    const mobileCapable = webgl2 && !saveData && !veryLowMem && !fewCores;
+    const mobileCapable = !saveData && !veryLowMem && !fewCores;
     setTier(mobileCapable && (!wideEnough || !finePointer) ? "mobile" : "poster");
     setPortrait(isPortraitView);
   }, [motionEnabled, isPoster]);
@@ -135,11 +139,15 @@ export function HeroGate() {
 
   // mount: full tier mounts immediately; mobile waits for arm + the hero being
   // on-screen (if the first gesture is a fast scroll past the hero, GL init is
-  // deferred until it scrolls back into view). Once mounted, stays mounted.
+  // deferred until it scrolls back into view). The WebGL2 probe runs HERE —
+  // post-interaction — never at hydration (see the capability gate note).
+  // Once mounted, stays mounted.
   useEffect(() => {
     if (tier === "full") setMounted3D(true);
-    else if (tier === "mobile" && armed && active) setMounted3D(true);
-    else if (tier === "poster") setMounted3D(false);
+    else if (tier === "mobile" && armed && active) {
+      if (supportsWebGL2()) setMounted3D(true);
+      else setTier("poster");
+    } else if (tier === "poster") setMounted3D(false);
   }, [tier, armed, active]);
 
   // pause when off-screen or the tab is hidden (§8)
