@@ -114,6 +114,22 @@ unchanged (screenshot-diffed at 1280/1440).
   press, Playwright gets `retries: 1` on CI only, failing tests are surfaced as
   public annotations (github reporter), and the lhci step greps its assertion
   output into an annotation + step summary on failure.
+- **CI Lighthouse variance (runs #29–#33).** After the interaction-only fix the
+  CI perf score still failed (0.74) while local scored 0.95. Diagnosed by
+  re-running Lighthouse locally at `cpuSlowdownMultiplier=10`: the
+  **pre-overhaul baseline scores 0.71 under the same conditions** (TBT ~870 ms
+  from initial-bundle hydration, LCP ~3.4 s from the font-gated `<h1>`) — the
+  site has always been at the gate's edge and GitHub's slower runner fleet now
+  pushes single runs under it; this is not a mobile-overhaul regression.
+  Mitigations: (1) the poster `<link rel=preload>`s were dropped — the
+  `<picture>` sources are preload-scanner-discoverable in the initial HTML
+  anyway, and removing the competing fetches improves slow-tier LCP by ~500 ms
+  (beats the old baseline; neutral at normal speed); (2) `lighthouserc.json`
+  `numberOfRuns: 1 → 3` so assertions run against the median (TBT at high
+  slowdown swung 864→1627 ms between runs on identical code). If the gate still
+  fails persistently, the next lever is the Phase-5-deferred gsap/lenis
+  lazy-load (~30 KB off the initial bundle → direct TBT cut) — not attempted in
+  this pass.
 - **No new dependencies** (§7.2 check: everything uses existing
   gsap/lenis/r3f/three/zustand/playwright/sharp).
 

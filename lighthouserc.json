@@ -5,7 +5,7 @@
       "startServerReadyPattern": "Ready in|started server on|Local:",
       "startServerReadyTimeout": 60000,
       "url": ["http://localhost:3000/", "http://localhost:3000/dossier"],
-      "numberOfRuns": 1,
+      "numberOfRuns": 3,
       "settings": {
         "formFactor": "mobile",
         "throttlingMethod": "simulate",

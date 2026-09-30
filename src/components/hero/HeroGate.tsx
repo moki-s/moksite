@@ -199,23 +199,6 @@ export function HeroGate() {
 
   return (
     <section ref={sectionRef} id="hero" aria-label="Cold open — a noir city at night" className="hero">
-      {/* LCP preloads — media-scoped so each viewport fetches exactly one poster
-          (React hoists these to <head> during SSR). */}
-      <link
-        rel="preload"
-        as="image"
-        href="/poster/hero.avif"
-        media="(min-width: 1024px), (orientation: landscape)"
-        fetchPriority="high"
-      />
-      <link
-        rel="preload"
-        as="image"
-        href="/poster/hero-portrait.avif"
-        media="(max-width: 1023px) and (orientation: portrait)"
-        fetchPriority="high"
-      />
-
       {/* §5.1 poster (the LCP) — art-directed: portrait phones get the
           portrait-composed capture instead of a centre-crop of the landscape
           one. Native <picture> because next/image cannot art-direct. */}
