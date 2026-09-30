@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Anton, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import "../styles/globals.css";
@@ -11,6 +11,7 @@ import { Footer } from "@/components/ui/Footer";
 import { TerminalLauncher } from "@/components/terminal/TerminalLauncher";
 import { EvidenceTallyLazy } from "@/components/game/EvidenceTallyLazy";
 import { FlashlightLazy } from "@/components/game/FlashlightLazy";
+import { TorchToggleLazy } from "@/components/game/TorchToggleLazy";
 import { getAllCases } from "@/lib/content";
 
 // §4.2 — three self-hosted families via next/font/google.
@@ -47,6 +48,16 @@ export const metadata: Metadata = {
   description: `The portfolio of ${siteConfig.name}, ${siteConfig.role}.`,
 };
 
+// Mobile: explicit viewport (Next's default values). NOTE: no `interactiveWidget`
+// — WebKit logs a console ERROR for the unrecognized key (breaks the §12
+// zero-console-error gate); the virtual-keyboard problem is solved for both
+// engines via the visualViewport listener in Terminal.tsx instead. No
+// maximum-scale — pinch zoom stays (WCAG 1.4.4).
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -74,6 +85,7 @@ export default function RootLayout({
           <TerminalLauncher cases={caseList} />
           <EvidenceTallyLazy />
           <FlashlightLazy />
+          <TorchToggleLazy />
         </MotionProvider>
         {plausibleDomain && (
           <Script

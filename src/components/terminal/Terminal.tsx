@@ -12,6 +12,7 @@ import {
 } from "@/components/terminal/registry";
 import { useAppStore } from "@/store/useAppStore";
 import { useMotion } from "@/components/MotionProvider";
+import { usePointerCoarse } from "@/lib/usePointerCoarse";
 import { track } from "@/lib/analytics";
 import { Crt } from "@/components/terminal/Crt";
 import { EVIDENCE_TOTAL } from "@/components/game/evidence";
@@ -47,6 +48,7 @@ export default function Terminal({ cases }: { cases: CaseMeta[] }) {
   const logRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const prevFocus = useRef<HTMLElement | null>(null);
+  const coarse = usePointerCoarse();
 
   // mount: capture focus + lock scroll + boot timer; restore focus/scroll on close
   useEffect(() => {
@@ -62,9 +64,37 @@ export default function Terminal({ cases }: { cases: CaseMeta[] }) {
     };
   }, []);
 
+  // §5.7 mobile: do NOT autofocus — that would immediately summon the virtual
+  // keyboard over half the screen; touch users start from the tap-row and tap
+  // the input when they want to type.
   useEffect(() => {
-    if (booted) inputRef.current?.focus();
-  }, [booted]);
+    if (booted && !coarse) inputRef.current?.focus();
+  }, [booted, coarse]);
+
+  // §5.7 mobile: size the overlay to the *visual* viewport so the on-screen
+  // keyboard never covers the input row. Chromium resizes the layout viewport
+  // for us (viewport `interactive-widget=resizes-content` in layout.tsx); iOS
+  // only reports it via visualViewport, so we mirror it into CSS vars consumed
+  // by the (pointer: coarse) overlay rule in globals.css.
+  useEffect(() => {
+    if (!coarse) return;
+    const vv = window.visualViewport;
+    const el = dialogRef.current;
+    if (!vv || !el) return;
+    const apply = () => {
+      el.style.setProperty("--vvh", `${vv.height}px`);
+      el.style.setProperty("--vvt", `${vv.offsetTop}px`);
+    };
+    apply();
+    vv.addEventListener("resize", apply);
+    vv.addEventListener("scroll", apply);
+    return () => {
+      vv.removeEventListener("resize", apply);
+      vv.removeEventListener("scroll", apply);
+      el.style.removeProperty("--vvh");
+      el.style.removeProperty("--vvt");
+    };
+  }, [coarse]);
 
   useEffect(() => {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
@@ -204,6 +234,10 @@ export default function Terminal({ cases }: { cases: CaseMeta[] }) {
       tabIndex={-1}
       className="terminal-overlay"
       onKeyDown={onDialogKey}
+      onPointerDown={() => {
+        // touch parity with "press any key" — a tap skips the boot line
+        if (!booted) setBooted(true);
+      }}
     >
       <Crt>
         <div className="terminal-head">
@@ -282,6 +316,7 @@ export default function Terminal({ cases }: { cases: CaseMeta[] }) {
             autoCapitalize="off"
             autoCorrect="off"
             spellCheck={false}
+            enterKeyHint="send"
             aria-label="terminal input"
             value={input}
             onChange={(e) => setInput(e.target.value)}

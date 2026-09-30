@@ -4,6 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type MouseEvent } from "react";
 import { useMotion } from "@/components/MotionProvider";
+import { useAppStore } from "@/store/useAppStore";
+import { useMounted } from "@/lib/useMounted";
+import { usePointerCoarse } from "@/lib/usePointerCoarse";
+import { track } from "@/lib/analytics";
 
 // §3 / §6.4 — sticky top nav, appears after Panel 0 on the home scroll story.
 const LINKS = [
@@ -16,6 +20,9 @@ const LINKS = [
 export function NavBar() {
   const pathname = usePathname();
   const { scrollTo } = useMotion();
+  const openTerminal = useAppStore((s) => s.openTerminal);
+  const mounted = useMounted();
+  const coarse = usePointerCoarse();
   const isHome = pathname === "/";
   const [visible, setVisible] = useState(!isHome);
 
@@ -63,6 +70,24 @@ export function NavBar() {
             DOSSIER
           </Link>
         </li>
+        {/* §5.7 — touch has no backtick key: coarse pointers get an explicit
+            Command Center trigger (post-mount, so desktop SSR markup is
+            unchanged). Analytics method "nav" — docs/DECISIONS.md. */}
+        {mounted && coarse && (
+          <li>
+            <button
+              type="button"
+              className="navbar-link navbar-cmd"
+              aria-label="Open the Command Center"
+              onClick={() => {
+                track("terminal_open", { method: "nav" });
+                openTerminal();
+              }}
+            >
+              &gt;_
+            </button>
+          </li>
+        )}
       </ul>
     </nav>
   );

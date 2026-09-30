@@ -52,7 +52,7 @@ function Art({ kind }: { kind: EvidenceKind }) {
   }
 }
 
-export function HiddenProp({ id, label, kind, top, left }: EvidenceProp) {
+export function HiddenProp({ id, label, kind, top, left, smTop, smLeft }: EvidenceProp) {
   const mounted = useMounted();
   const storedFound = useAppStore((s) => s.foundEvidence.includes(id));
   const markFound = useAppStore((s) => s.markFound);
@@ -69,7 +69,16 @@ export function HiddenProp({ id, label, kind, top, left }: EvidenceProp) {
       type="button"
       className={`evidence-prop evidence-prop--${kind}`}
       data-found={found || undefined}
-      style={{ top: `${top}%`, left: `${left}%` }}
+      // position via CSS custom properties so globals.css can pick the ≤767px
+      // coords; desktop resolves --p-top/--p-left to the same values as before
+      style={
+        {
+          "--p-top": `${top}%`,
+          "--p-left": `${left}%`,
+          "--p-top-sm": `${smTop ?? top}%`,
+          "--p-left-sm": `${smLeft ?? left}%`,
+        } as React.CSSProperties
+      }
       aria-pressed={found}
       aria-label={found ? `Found: ${label}` : `Spot ${label}`}
       onPointerEnter={find}

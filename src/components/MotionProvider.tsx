@@ -57,6 +57,9 @@ export function MotionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!mounted) return;
     gsap.registerPlugin(ScrollTrigger);
+    // Mobile: the address bar showing/hiding fires resize events mid-scroll;
+    // don't thrash refreshes over them (no-op on desktop — no dynamic chrome).
+    ScrollTrigger.config({ ignoreMobileResize: true });
 
     if (!motionEnabled) {
       // native scroll; make sure any previously-armed reveals settle visible.
@@ -64,7 +67,11 @@ export function MotionProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const lenis = new Lenis();
+    // syncTouch stays FALSE (the default, made explicit): on touch, Lenis
+    // passes native momentum scrolling through untouched — nothing here is
+    // pinned or scroll-synced, and syncTouch is documented as unstable on
+    // older iOS. Do not "fix" mobile by turning it on (docs/DECISIONS.md).
+    const lenis = new Lenis({ syncTouch: false });
     lenisRef.current = lenis;
     lenis.on("scroll", ScrollTrigger.update);
     const tick = (time: number) => lenis.raf(time * 1000);
@@ -83,7 +90,21 @@ export function MotionProvider({ children }: { children: ReactNode }) {
     // re-measure after web fonts load (layout shifts otherwise)
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
 
+    // rotating a phone changes every trigger position; re-measure once the
+    // layout has settled (ignoreMobileResize above suppresses the noisy path)
+    let orientTimer = 0;
+    const onOrient = () => {
+      window.clearTimeout(orientTimer);
+      orientTimer = window.setTimeout(() => ScrollTrigger.refresh(), 200);
+    };
+    const so = window.screen?.orientation;
+    if (so?.addEventListener) so.addEventListener("change", onOrient);
+    else window.addEventListener("orientationchange", onOrient);
+
     return () => {
+      if (so?.removeEventListener) so.removeEventListener("change", onOrient);
+      else window.removeEventListener("orientationchange", onOrient);
+      window.clearTimeout(orientTimer);
       gsap.ticker.remove(tick);
       lenis.destroy();
       lenisRef.current = null;

@@ -29,7 +29,7 @@ export function Origin() {
             src="/images/portrait.webp"
             alt={`${siteConfig.name} — ${siteConfig.role}`}
             fill
-            sizes="(max-width: 760px) 100vw, 360px"
+            sizes="(max-width: 767px) 100vw, 360px"
             className="origin-portrait-img"
           />
           {/* §5.3 — ink/bone duotone treatment of a real photo (original artwork,

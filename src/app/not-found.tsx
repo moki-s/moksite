@@ -2,12 +2,16 @@
 
 import Link from "next/link";
 import { useAppStore } from "@/store/useAppStore";
+import { useMounted } from "@/lib/useMounted";
+import { usePointerCoarse } from "@/lib/usePointerCoarse";
 import { track } from "@/lib/analytics";
 
 // §5.9 — 404. The hint is a discovery path into the Command Center (§5.7).
 // (Visual polish lands in Phase 6/7.)
 export default function NotFound() {
   const openTerminal = useAppStore((s) => s.openTerminal);
+  const mounted = useMounted();
+  const coarse = usePointerCoarse();
   return (
     <main id="main-content" tabIndex={-1} className="notfound">
       <h1 className="notfound-title">PAGE REDACTED.</h1>
@@ -25,7 +29,9 @@ export default function NotFound() {
           openTerminal();
         }}
       >
-        ACCESS DENIED? TRY THE BACK DOOR. [ ` ]
+        {mounted && coarse
+          ? "ACCESS DENIED? TRY THE BACK DOOR."
+          : "ACCESS DENIED? TRY THE BACK DOOR. [ ` ]"}
       </button>
     </main>
   );

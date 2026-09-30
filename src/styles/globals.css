@@ -223,7 +223,10 @@ html.no-motion .hero-caption {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* svh: size to the *small* viewport so mobile browser chrome never crops the
+     overlay; on desktop svh == vh (no dynamic chrome) — computed height identical */
   min-height: 100vh;
+  min-height: 100svh;
   padding: 1.5rem;
   text-align: center;
   background-color: var(--ink);
@@ -291,6 +294,7 @@ html.no-motion .hero-caption {
   flex-direction: column;
   justify-content: center;
   min-height: 100vh;
+  min-height: 100svh; /* mobile browser-chrome safe; == 100vh on desktop */
   padding: 6rem 1.5rem;
   background-color: var(--midnight);
   border: 5px solid var(--bone);
@@ -877,6 +881,12 @@ html.no-motion .hero-caption {
    Phase 4 — 3D cold open (hero)
    ========================================================================== */
 .hero-poster-img {
+  /* explicit fill positioning (was inline styles from next/image `fill` before
+     the <picture> art-direction swap — computed layout identical) */
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   z-index: 0;
 }
@@ -1138,7 +1148,9 @@ html.no-motion .terminal-overlay {
 .terminal-taprow {
   display: none;
 }
-@media (max-width: 640px) {
+/* widened to include ALL coarse pointers (§5.7 tap-row: touch tablets between
+   641–1024px were missing it) — desktop fine-pointer >640px is unaffected */
+@media (max-width: 640px), (pointer: coarse) {
   .crt-inner {
     max-width: none;
     padding: 1rem;
@@ -1151,6 +1163,7 @@ html.no-motion .terminal-overlay {
   }
   .terminal-tap {
     flex: 0 0 auto;
+    min-height: 2.75rem; /* ≥44px touch target */
     padding: 0.4rem 0.8rem;
     background: transparent;
     border: 1px solid color-mix(in srgb, var(--signal) 40%, transparent);
@@ -1158,6 +1171,17 @@ html.no-motion .terminal-overlay {
     text-transform: uppercase;
     letter-spacing: 0.08em;
     cursor: pointer;
+  }
+  .terminal-close {
+    padding: 0.5rem 0.75rem; /* ≥44px touch target */
+  }
+  /* the vigilante / coffee ASCII art is ~37ch wide — contain it so it can
+     never cause page-level horizontal scroll on narrow screens */
+  .terminal-ascii {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 0.7rem;
   }
 }
 
@@ -1196,6 +1220,7 @@ html.high-contrast *::after {
   justify-content: center;
   gap: 1.25rem;
   min-height: 100vh;
+  min-height: 100svh; /* mobile browser-chrome safe; == 100vh on desktop */
   padding: 2rem 1.5rem;
   text-align: center;
 }
@@ -1344,6 +1369,10 @@ html.high-contrast *::after {
 }
 .evidence-prop {
   position: absolute;
+  /* coords come in as custom properties (HiddenProp.tsx) so the ≤767px block
+     can swap to the mobile-safe positions; desktop values are unchanged */
+  top: var(--p-top);
+  left: var(--p-left);
   transform: translate(-50%, -50%);
   width: 2.4rem;
   height: 2.4rem;
@@ -1366,10 +1395,26 @@ html.high-contrast *::after {
 html.motion .evidence-layer[data-flashlight] .evidence-prop {
   opacity: var(--reveal, 0);
 }
+/* §11 touch-torch (docs/DECISIONS.md, 30 Sep 2026 — replaces the old
+   always-visible-at-0.4 fallback): on touch, unfound props are hidden AND
+   inert so they can never intercept taps meant for content; arming the torch
+   (TorchToggle) turns the layer into the sweep surface and lights nearby
+   props, which then become tappable. Reduced motion keeps the camouflaged
+   0.4 fallback via the base rule (these are html.motion-scoped). */
 @media (pointer: coarse) {
-  /* touch has no cursor to sweep → keep them camouflaged-visible */
   html.motion .evidence-layer[data-flashlight] .evidence-prop {
-    opacity: 0.4;
+    opacity: var(--reveal, 0);
+    pointer-events: none;
+  }
+  html.motion .evidence-layer[data-flashlight] .evidence-prop[data-lit] {
+    pointer-events: auto;
+  }
+  html.motion .evidence-layer[data-flashlight] .evidence-prop[data-found] {
+    pointer-events: none; /* bagged trophies never eat taps */
+  }
+  html.motion .evidence-layer[data-torch] {
+    pointer-events: auto;
+    touch-action: none; /* the sweep must not scroll; disarm restores scroll */
   }
 }
 .evidence-art,
@@ -1487,4 +1532,194 @@ html.no-motion .evidence-art,
 html.no-motion .evidence-tally-flash {
   transition: none !important;
   animation: none !important;
+}
+
+/* ==========================================================================
+   Phase M — mobile & touch (see docs/DECISIONS.md, 30 Sep 2026)
+   --------------------------------------------------------------------------
+   DESKTOP-INVARIANCE CONTRACT: every rule below lives inside a max-width or
+   (pointer: coarse) media query. Token changes are :root RE-declarations in
+   those queries — the base @theme/:root values are law (§4) and untouched.
+   Desktop (≥768px, fine pointer) matches none of these blocks.
+   ========================================================================== */
+
+/* ---- phones & small tablets ------------------------------------------- */
+@media (max-width: 767px) {
+  /* §4.2 — fluid heading tokens; clamps meet the desktop values at 767px so
+     there is no visible jump crossing the 768 breakpoint */
+  :root {
+    --text-h1: clamp(2rem, 7vw + 0.6rem, 3.5rem);
+    --text-h2: clamp(1.75rem, 6vw, 2.25rem);
+  }
+
+  /* overflow safety net — long Anton titles must never cause page-level
+     horizontal scroll. `clip` (not hidden) so no accidental scroll container
+     appears under Lenis. */
+  html,
+  body {
+    overflow-x: clip;
+  }
+  .hero-name,
+  .section-title,
+  .case-title,
+  .case-title-lg,
+  .notfound-title,
+  .case-metric-value,
+  .signal-links a,
+  .signal-lost,
+  .footer-links a,
+  .terminal-out {
+    overflow-wrap: anywhere;
+  }
+
+  /* metric values ($100 → $800–1,000) run longer than headings */
+  .case-metric-value {
+    font-size: clamp(1.5rem, 9vw, var(--text-h1));
+  }
+  .case-metrics {
+    gap: 1.5rem 2.5rem;
+  }
+
+  /* §5.3 — the 3:4 portrait was a full-width monolith on phones */
+  .origin-portrait {
+    width: 100%;
+    max-width: 20rem;
+    margin-inline: auto;
+  }
+
+  /* §11 — mobile-safe hunt-prop positions (quiet zones; see evidence.ts) */
+  .evidence-prop {
+    top: var(--p-top-sm);
+    left: var(--p-left-sm);
+  }
+
+  /* §3 — navbar: 5 mono items must survive 320px; wrap is the guarantee,
+     the padding makes each link a ≥24px touch target (WCAG 2.5.8) */
+  .navbar {
+    justify-content: center;
+    padding: 0.75rem 1rem;
+  }
+  .navbar-list {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  .navbar-link {
+    display: inline-block;
+    padding: 0.4rem 0.2rem;
+  }
+}
+
+/* ---- small phones ------------------------------------------------------ */
+@media (max-width: 479px) {
+  :root {
+    --text-display: clamp(2.5rem, 11vw, 3.5rem);
+  }
+  .panel {
+    padding: 4rem 1.5rem; /* keeps the §4.3 24px mobile gutter */
+  }
+  .case-folder {
+    padding: 1rem;
+    gap: 0.75rem; /* stamp + body must coexist at 320px */
+  }
+}
+
+/* ---- narrowest tier (320px) -------------------------------------------- */
+@media (max-width: 374px) {
+  .navbar-list {
+    gap: 0.5rem;
+  }
+  .navbar-link {
+    letter-spacing: 0.06em;
+  }
+}
+
+/* ---- touch (any width) -------------------------------------------------- */
+@media (pointer: coarse) {
+  /* §5.1 — the lit-window terminal hotspot was 28×36px; give thumbs a real
+     target (still invisible — discovery stays part of the game) */
+  .hero-hotspot {
+    width: 48px;
+    height: 52px;
+  }
+
+  /* §5.4 — touch has no hover: case summaries are always revealed (the summary
+     is the scent that earns the tap; hiding it behind a first tap subtracts
+     information — docs/DECISIONS.md) and the stamp sits in its "lifted" state. */
+  .case-summary {
+    max-height: none;
+    opacity: 1;
+  }
+  .case-stamp {
+    transform: rotate(-1deg);
+    opacity: 0.25;
+  }
+  .case-folder:active {
+    transform: translateY(-2px); /* §5.4 tactile lift on tap */
+  }
+
+  /* §5.7 — terminal sized to the VISUAL viewport (the on-screen keyboard must
+     never cover the input row). --vvh/--vvt are set by Terminal.tsx from
+     visualViewport (iOS); the dvh fallback covers pre-JS + Chromium, whose
+     layout viewport already resizes via interactive-widget (layout.tsx). */
+  .terminal-overlay {
+    inset: auto 0 auto 0;
+    top: var(--vvt, 0px);
+    height: var(--vvh, 100dvh);
+  }
+  /* 16px input kills iOS zoom-on-focus (was 14px mono) */
+  .terminal-input {
+    font-size: var(--text-body);
+  }
+
+  /* §5.7 — the coarse-only Command Center trigger in the navbar */
+  .navbar-cmd {
+    background: transparent;
+    border: 1px solid color-mix(in srgb, var(--rain) 40%, transparent);
+    padding: 0.4rem 0.6rem;
+    cursor: pointer;
+  }
+
+  /* §11 — thumb-sized light pool (the 22rem desktop pool dwarfs a phone) */
+  .flashlight {
+    width: 14rem;
+    height: 14rem;
+    margin: -7rem 0 0 -7rem;
+  }
+
+  /* §11 — torch chip, bottom-left (mirrors the tally bottom-right). The armed
+     state is --signal: ONE earned amber element — it is the active game
+     affordance (§4.1, logged in docs/DECISIONS.md). */
+  .torch-toggle-wrap {
+    position: fixed;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 30; /* below the sticky nav (--z-nav: 40), like the tally */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+  .torch-toggle {
+    padding: 0.5rem 0.8rem;
+    font-family: var(--font-plex-mono), monospace;
+    font-size: var(--text-caption);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--rain);
+    background: color-mix(in srgb, var(--ink) 82%, transparent);
+    border: 1px solid color-mix(in srgb, var(--rain) 40%, transparent);
+    cursor: pointer;
+  }
+  .torch-toggle[aria-pressed="true"] {
+    color: var(--signal);
+    border-color: color-mix(in srgb, var(--signal) 60%, transparent);
+  }
+  .torch-hint {
+    font-family: var(--font-plex-mono), monospace;
+    font-size: var(--text-caption);
+    color: var(--rain);
+    background: color-mix(in srgb, var(--ink) 82%, transparent);
+    padding: 0.2rem 0.5rem;
+  }
 }

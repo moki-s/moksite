@@ -84,7 +84,17 @@ const ARC = 0.4; // rad — half-swing
 const FROZEN_SWING = 0.14; // poster: near-vertical
 
 // pivot sits on the beacon-tower roof (centre): tower h=8 at base y=-3 → roof y=5.
-export function Searchlight({ frozen = false }: { frozen?: boolean }) {
+// `coneSegments`/`signalScale` default to the desktop values; the mobile tier
+// passes lighter tessellation + a slightly larger M (src/lib/heroCamera.ts).
+export function Searchlight({
+  frozen = false,
+  coneSegments = [48, 36],
+  signalScale = [4.5, 5, 1],
+}: {
+  frozen?: boolean;
+  coneSegments?: [number, number];
+  signalScale?: [number, number, number];
+}) {
   const pivot = useRef<THREE.Group>(null);
   const signal = useRef<THREE.Sprite>(null);
   const beam = useMemo(() => makeBeamTexture(), []);
@@ -119,7 +129,7 @@ export function Searchlight({ frozen = false }: { frozen?: boolean }) {
       {/* defined shaft — short + wide cones so the beam spreads in-frame; the
           gradient makes it brightest at the tower roof, fading into the sky. */}
       <mesh position={[0, 4.5, 0]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[2.8, 9, 48, 1, true]} />
+        <coneGeometry args={[2.8, 9, coneSegments[0], 1, true]} />
         <meshBasicMaterial
           map={beam}
           color={SIGNAL}
@@ -132,7 +142,7 @@ export function Searchlight({ frozen = false }: { frozen?: boolean }) {
         />
       </mesh>
       <mesh position={[0, 4.5, 0]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[5, 9, 36, 1, true]} />
+        <coneGeometry args={[5, 9, coneSegments[1], 1, true]} />
         <meshBasicMaterial
           map={beam}
           color={SIGNAL}
@@ -146,7 +156,7 @@ export function Searchlight({ frozen = false }: { frozen?: boolean }) {
       </mesh>
 
       {/* projected "M" — upper-centre, in the beam, carved as negative space */}
-      <sprite ref={signal} position={[0, 1.5, 0]} scale={[4.5, 5, 1]}>
+      <sprite ref={signal} position={[0, 1.5, 0]} scale={signalScale}>
         <spriteMaterial
           map={tex}
           color={SIGNAL}

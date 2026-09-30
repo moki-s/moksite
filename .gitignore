@@ -53,8 +53,9 @@ next-env.d.ts
 /lhci-report/
 /.lighthouseci/
 
-# poster-capture preview artifact (the committed output is public/poster/hero.avif)
+# poster-capture preview artifacts (the committed outputs are public/poster/*.avif)
 /scripts/poster-preview.png
+/scripts/poster-preview-portrait.png
 
 # source-of-truth CV (PII: phone number) — never commit to the public repo (§A.6)
 /docs/cv-master.pdf

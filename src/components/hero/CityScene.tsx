@@ -1,10 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { Rain } from "@/components/hero/Rain";
 import { Searchlight } from "@/components/hero/Searchlight";
+import {
+  DESKTOP_QUALITY,
+  HERO_CAMERA,
+  SIGNAL_SCALE,
+  type HeroQuality,
+} from "@/lib/heroCamera";
 
 // Deterministic PRNG so the skyline is identical every visit (§5.1).
 function mulberry32(seed: number) {
@@ -102,11 +108,9 @@ function City({ texture }: { texture: THREE.Texture }) {
   );
 }
 
-function Scene({ frozen = false }: { frozen?: boolean }) {
-  const group = useRef<THREE.Group>(null);
-  const texture = useMemo(() => makeWindowTexture(), []);
-
-  // pointer parallax ±3° (lerped) — §5.1
+// Pointer parallax ±3° (lerped) — §5.1. Isolated so the mobile tier (no
+// pointer) can skip the per-frame work entirely.
+function Parallax({ group }: { group: React.RefObject<THREE.Group | null> }) {
   useFrame((state) => {
     if (!group.current) return;
     const targetY = state.pointer.x * 0.052;
@@ -114,14 +118,54 @@ function Scene({ frozen = false }: { frozen?: boolean }) {
     group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, targetY, 0.05);
     group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, targetX, 0.05);
   });
+  return null;
+}
+
+// Mobile 30 fps cap: with frameloop="demand" the canvas renders only when
+// invalidated; this rAF accumulator invalidates on a fixed cadence. Consistent
+// frame pacing beats a thermally-throttled 45↔60 wobble on phones (§8 ≥30fps).
+function FrameLimiter({ fps }: { fps: number }) {
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => {
+    let raf = 0;
+    let last = 0;
+    const loop = (t: number) => {
+      raf = requestAnimationFrame(loop);
+      if (t - last >= 1000 / fps) {
+        last = t;
+        invalidate();
+      }
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [fps, invalidate]);
+  return null;
+}
+
+function Scene({
+  frozen = false,
+  parallax,
+  signalScale,
+  rainCount,
+  coneSegments,
+}: {
+  frozen?: boolean;
+  parallax: boolean;
+  signalScale: [number, number, number];
+  rainCount: number;
+  coneSegments: [number, number];
+}) {
+  const group = useRef<THREE.Group>(null);
+  const texture = useMemo(() => makeWindowTexture(), []);
 
   useEffect(() => () => texture.dispose(), [texture]);
 
   return (
     <group ref={group}>
+      {parallax && <Parallax group={group} />}
       <City texture={texture} />
-      <Rain />
-      <Searchlight frozen={frozen} />
+      <Rain count={rainCount} />
+      <Searchlight frozen={frozen} coneSegments={coneSegments} signalScale={signalScale} />
     </group>
   );
 }
@@ -129,23 +173,43 @@ function Scene({ frozen = false }: { frozen?: boolean }) {
 export default function CityScene({
   active,
   frozen = false,
+  portrait = false,
+  quality = DESKTOP_QUALITY,
   onCreated,
 }: {
   active: boolean;
   frozen?: boolean;
+  /** portrait framing — only ever true on the mobile tier / portrait poster capture */
+  portrait?: boolean;
+  quality?: HeroQuality;
   onCreated?: () => void;
 }) {
+  const cam = HERO_CAMERA[portrait ? "portrait" : "landscape"];
+  const capped = quality.fpsCap !== null;
   return (
     <Canvas
-      frameloop={active ? "always" : "never"}
-      camera={{ position: [0, 4, 18], fov: 50 }}
-      gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
-      dpr={[1, 1.5]}
+      // desktop: always/never (unchanged). fps-capped tier: demand/never — the
+      // FrameLimiter below drives invalidation at the capped cadence.
+      frameloop={active ? (capped ? "demand" : "always") : "never"}
+      camera={{ position: cam.position, fov: cam.fov }}
+      gl={{
+        antialias: quality.antialias,
+        alpha: false,
+        powerPreference: "high-performance",
+      }}
+      dpr={quality.dpr}
       onCreated={() => onCreated?.()}
     >
       <color attach="background" args={["#0b0e13"]} />
       <fog attach="fog" args={["#0b0e13", 8, 28]} />
-      <Scene frozen={frozen} />
+      {capped && active && <FrameLimiter fps={quality.fpsCap!} />}
+      <Scene
+        frozen={frozen}
+        parallax={quality.parallax}
+        signalScale={SIGNAL_SCALE[portrait ? "portrait" : "landscape"]}
+        rainCount={quality.rainCount}
+        coneSegments={quality.coneSegments}
+      />
     </Canvas>
   );
 }

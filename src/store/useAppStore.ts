@@ -22,6 +22,10 @@ type AppState = {
   // cursor torch on/off (persisted); off → props are camouflaged-visible instead.
   flashlightEnabled: boolean;
   toggleFlashlight: () => void;
+  // §11 touch-torch mode (session-only, like terminalOpen): while armed, the
+  // evidence layers capture touches as a sweepable light pool.
+  torchArmed: boolean;
+  setTorchArmed: (armed: boolean) => void;
 };
 
 export const useAppStore = create<AppState>()(
@@ -46,6 +50,8 @@ export const useAppStore = create<AppState>()(
       flashlightEnabled: true,
       toggleFlashlight: () =>
         set((s) => ({ flashlightEnabled: !s.flashlightEnabled })),
+      torchArmed: false,
+      setTorchArmed: (torchArmed) => set({ torchArmed }),
     }),
     {
       name: "moksite-prefs",

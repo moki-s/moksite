@@ -12,6 +12,10 @@ export function Spotlight() {
 
   useEffect(() => {
     if (!motionEnabled) return;
+    // §5.6 — touch: no cursor to follow; stray touch-drag pointermoves would
+    // yank the light around, so bail and let the CSS defaults hold it fixed
+    // on the form.
+    if (!window.matchMedia("(pointer: fine)").matches) return;
     const el = ref.current;
     const panel = el?.closest("section");
     if (!el || !panel) return;

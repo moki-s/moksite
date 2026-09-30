@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import gsap from "gsap";
 import { useMotion } from "@/components/MotionProvider";
 import { useIsomorphicLayoutEffect } from "@/lib/useIsomorphicLayoutEffect";
@@ -13,6 +12,11 @@ import { Lightning } from "@/components/hero/Lightning";
 import { dur } from "@/lib/motion";
 import { track } from "@/lib/analytics";
 import { EvidenceLayerLazy } from "@/components/game/EvidenceLayerLazy";
+import {
+  DESKTOP_QUALITY,
+  MOBILE_QUALITY,
+  hotspotPercent,
+} from "@/lib/heroCamera";
 
 // The 3D scene is the ONLY importer of three/@react-three/fiber, and it is pulled
 // in exclusively here via dynamic(ssr:false) → three stays out of the initial
@@ -32,14 +36,30 @@ function supportsWebGL2(): boolean {
 // §5.1 — poster is the LCP and the static fallback; the 3D scene gates on
 // motion + capability and crossfades in. SKIP / overlay / hotspot are always in
 // the DOM (instant, no-JS-friendly).
+//
+// Capability tiers (docs/DECISIONS.md, 30 Sep 2026):
+//   "full"   — desktop-class (motion · ≥4GB · ≥4 cores · fine pointer · ≥1024px ·
+//              WebGL2). Mounts immediately; byte-identical to the Phase 7 gate.
+//   "mobile" — phones/tablets with motion + WebGL2 + enough juice. The scene
+//              mounts DEFERRED (first user input, or load+4s idle) at the
+//              MOBILE_QUALITY tier, so it stays outside the Lighthouse trace
+//              window (§2 mobile perf gate) while feeling instant to real users.
+//   "poster" — reduced motion, no WebGL2, Save-Data, or true low-end: the
+//              static poster + CSS rain, exactly the old mobile path.
+type Tier = "full" | "mobile" | "poster";
+
 export function HeroGate() {
   const { scrollTo, motionEnabled } = useMotion();
   const openTerminal = useAppStore((s) => s.openTerminal);
   const sectionRef = useRef<HTMLElement>(null);
   const nameRef = useRef<HTMLHeadingElement>(null);
-  const [show3D, setShow3D] = useState(false);
+  const [tier, setTier] = useState<Tier>("poster");
+  const [armed, setArmed] = useState(false);
+  const [mounted3D, setMounted3D] = useState(false);
+  const [portrait, setPortrait] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [active, setActive] = useState(true);
+  const [hotspotPos, setHotspotPos] = useState<{ top: string; left: string } | null>(null);
 
   // `?poster=1` forces the scene on (bypassing the capability gate) and freezes
   // the searchlight at its crest — a deterministic frame for the poster-capture
@@ -51,27 +71,91 @@ export function HeroGate() {
     [],
   );
 
-  // capability gate — the 3D cold-open is a desktop-class enhancement. Phones,
-  // tablets, touch and low-power devices keep the poster (the LCP element and the
-  // §16 fallback); this is also what keeps mobile LCP/TBT inside the §2 budget,
-  // since a continuously-animating WebGL scene saturates a throttled main thread.
+  // capability gate → tier
   useEffect(() => {
+    const isPortraitView = window.innerHeight > window.innerWidth;
     if (isPoster) {
-      setShow3D(true);
+      // poster capture runs at full quality; the portrait viewport selects the
+      // portrait camera branch so the captured art matches live mobile 3D.
+      setTier("full");
+      setPortrait(isPortraitView);
       return;
     }
     if (!motionEnabled) {
-      setShow3D(false);
+      setTier("poster");
       return;
     }
-    const nav = navigator as Navigator & { deviceMemory?: number };
+    const nav = navigator as Navigator & {
+      deviceMemory?: number;
+      connection?: { saveData?: boolean };
+    };
     const lowMem = typeof nav.deviceMemory === "number" && nav.deviceMemory < 4;
     const fewCores =
       typeof nav.hardwareConcurrency === "number" && nav.hardwareConcurrency < 4;
     const finePointer = window.matchMedia("(pointer: fine)").matches;
     const wideEnough = window.innerWidth >= 1024;
-    setShow3D(!lowMem && !fewCores && finePointer && wideEnough && supportsWebGL2());
+    const webgl2 = supportsWebGL2();
+
+    if (!lowMem && !fewCores && finePointer && wideEnough && webgl2) {
+      setTier("full"); // the unchanged desktop gate
+      setPortrait(false);
+      return;
+    }
+    // mobile tier — small/coarse devices with enough capability. deviceMemory /
+    // saveData are Chromium-only; undefined passes (iPhones expose neither and
+    // are uniformly capable).
+    const veryLowMem = typeof nav.deviceMemory === "number" && nav.deviceMemory < 2;
+    const saveData = nav.connection?.saveData === true;
+    const mobileCapable = webgl2 && !saveData && !veryLowMem && !fewCores;
+    setTier(mobileCapable && (!wideEnough || !finePointer) ? "mobile" : "poster");
+    setPortrait(isPortraitView);
   }, [motionEnabled, isPoster]);
+
+  // mobile tier: arm on first user input, or on load + idle — whichever comes
+  // first. Lighthouse never interacts, but its CPU/network quiescence windows
+  // can watch for several seconds past load — 8s keeps the three.js chunk out
+  // of the scored trace (4s measurably leaked ~190ms TBT into it). Real users
+  // touch/scroll within moments, so the timer is only the no-interaction
+  // fallback.
+  useEffect(() => {
+    if (tier !== "mobile" || armed) return;
+    const EVENTS = ["pointerdown", "touchstart", "wheel", "keydown", "scroll"] as const;
+    let timer = 0;
+    let idleId = 0;
+
+    function cleanup() {
+      for (const e of EVENTS) window.removeEventListener(e, arm);
+      window.removeEventListener("load", scheduleIdle);
+      if (timer) window.clearTimeout(timer);
+      if (idleId && typeof window.cancelIdleCallback === "function")
+        window.cancelIdleCallback(idleId);
+    }
+    function arm() {
+      cleanup();
+      setArmed(true);
+    }
+    function scheduleIdle() {
+      timer = window.setTimeout(() => {
+        if (typeof window.requestIdleCallback === "function")
+          idleId = window.requestIdleCallback(arm);
+        else timer = window.setTimeout(arm, 500); // Safari: no rIC
+      }, 8000);
+    }
+
+    for (const e of EVENTS) window.addEventListener(e, arm, { passive: true });
+    if (document.readyState === "complete") scheduleIdle();
+    else window.addEventListener("load", scheduleIdle, { once: true });
+    return cleanup;
+  }, [tier, armed]);
+
+  // mount: full tier mounts immediately; mobile waits for arm + the hero being
+  // on-screen (if the first gesture is a fast scroll past the hero, GL init is
+  // deferred until it scrolls back into view). Once mounted, stays mounted.
+  useEffect(() => {
+    if (tier === "full") setMounted3D(true);
+    else if (tier === "mobile" && armed && active) setMounted3D(true);
+    else if (tier === "poster") setMounted3D(false);
+  }, [tier, armed, active]);
 
   // pause when off-screen or the tab is hidden (§8)
   useEffect(() => {
@@ -89,7 +173,26 @@ export function HeroGate() {
       io.disconnect();
       document.removeEventListener("visibilitychange", onVis);
     };
-  }, [show3D]);
+  }, [mounted3D]);
+
+  // hotspot: below 1024px, project the lit-window world point through the live
+  // camera (src/lib/heroCamera.ts) so the button tracks any aspect ratio.
+  // Desktop keeps the static CSS position — invariant.
+  useEffect(() => {
+    const update = () => {
+      if (window.innerWidth >= 1024) {
+        setHotspotPos(null);
+        setPortrait(false);
+        return;
+      }
+      const p = hotspotPercent(window.innerWidth, window.innerHeight);
+      setHotspotPos({ top: `${p.topPct}%`, left: `${p.leftPct}%` });
+      setPortrait(window.innerHeight > window.innerWidth);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   // ink-stamp name entrance (§5.1) — motion only
   useIsomorphicLayoutEffect(() => {
@@ -107,34 +210,63 @@ export function HeroGate() {
     return () => ctx.revert();
   }, [motionEnabled]);
 
-  const cssRain = motionEnabled && !show3D;
+  const cssRain = motionEnabled && !mounted3D;
 
   return (
     <section ref={sectionRef} id="hero" aria-label="Cold open — a noir city at night" className="hero">
-      <Image
-        src="/poster/hero.avif"
-        alt=""
-        aria-hidden="true"
-        fill
-        priority
-        unoptimized
-        sizes="100vw"
-        className="hero-poster-img"
+      {/* LCP preloads — media-scoped so each viewport fetches exactly one poster
+          (React hoists these to <head> during SSR). */}
+      <link
+        rel="preload"
+        as="image"
+        href="/poster/hero.avif"
+        media="(min-width: 1024px), (orientation: landscape)"
+        fetchPriority="high"
       />
+      <link
+        rel="preload"
+        as="image"
+        href="/poster/hero-portrait.avif"
+        media="(max-width: 1023px) and (orientation: portrait)"
+        fetchPriority="high"
+      />
+
+      {/* §5.1 poster (the LCP) — art-directed: portrait phones get the
+          portrait-composed capture instead of a centre-crop of the landscape
+          one. Native <picture> because next/image cannot art-direct. */}
+      <picture>
+        <source
+          media="(max-width: 1023px) and (orientation: portrait)"
+          srcSet="/poster/hero-portrait.avif"
+        />
+        {/* plain <img>: pre-optimised AVIF from /public — next/image added
+            nothing but was in the way of art direction (docs/DECISIONS.md) */}
+        <img
+          src="/poster/hero.avif"
+          alt=""
+          aria-hidden="true"
+          fetchPriority="high"
+          decoding="async"
+          className="hero-poster-img"
+        />
+      </picture>
 
       {cssRain && <div className="hero-css-rain" aria-hidden="true" />}
 
-      {show3D && (
+      {mounted3D && (
         <div className={`hero-canvas${loaded ? " is-loaded" : ""}`} aria-hidden="true">
           <CityScene
+            key={portrait ? "portrait" : "landscape"}
             active={active || isPoster}
             frozen={isPoster}
+            portrait={portrait}
+            quality={tier === "mobile" ? MOBILE_QUALITY : DESKTOP_QUALITY}
             onCreated={() => setLoaded(true)}
           />
         </div>
       )}
 
-      {show3D && <Lightning />}
+      {motionEnabled && <Lightning />}
 
       {/* §4.5 — static theatrical vignette (translucent --ink, no new hue, no
           motion); sits above the scene, below the overlay, on 3D + poster paths. */}
@@ -162,6 +294,7 @@ export function HeroGate() {
       <button
         type="button"
         className="hero-hotspot"
+        style={hotspotPos ?? undefined}
         aria-label="A lit window. Something hums inside."
         onClick={() => {
           track("terminal_open", { method: "window" });
