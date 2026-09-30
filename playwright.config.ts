@@ -12,7 +12,9 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: 0,
   workers: 1,
-  reporter: "line",
+  // `github` on CI surfaces each failing test as a workflow annotation
+  // (readable from the run page / checks API without downloading logs)
+  reporter: process.env.CI ? [["line"], ["github"]] : "line",
   use: {
     baseURL: "http://localhost:3000",
     trace: "off",
