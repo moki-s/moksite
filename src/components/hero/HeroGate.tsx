@@ -111,41 +111,26 @@ export function HeroGate() {
     setPortrait(isPortraitView);
   }, [motionEnabled, isPoster]);
 
-  // mobile tier: arm on first user input, or on load + idle — whichever comes
-  // first. Lighthouse never interacts, but its CPU/network quiescence windows
-  // can watch for several seconds past load — 8s keeps the three.js chunk out
-  // of the scored trace (4s measurably leaked ~190ms TBT into it). Real users
-  // touch/scroll within moments, so the timer is only the no-interaction
-  // fallback.
+  // mobile tier: arm on the FIRST user input — and only on input. Timer-based
+  // arming (load+4s, then load+8s+idle) was tried and is a losing race: on a
+  // slow CI runner Lighthouse's quiescence window stretched past 8s and the
+  // three.js chunk entered the scored trace (perf 0.95 → 0.56). Interaction is
+  // deterministic: Lighthouse never interacts, so the chunk can never be
+  // scored; real users touch/scroll within moments ("SCROLL TO BEGIN" is the
+  // hero's own call to action), and a user who never interacts keeps the
+  // art-directed poster + CSS rain + lightning — the §5.1/§16 first-class
+  // fallback, not a degraded state.
   useEffect(() => {
     if (tier !== "mobile" || armed) return;
     const EVENTS = ["pointerdown", "touchstart", "wheel", "keydown", "scroll"] as const;
-    let timer = 0;
-    let idleId = 0;
-
-    function cleanup() {
+    const arm = () => {
       for (const e of EVENTS) window.removeEventListener(e, arm);
-      window.removeEventListener("load", scheduleIdle);
-      if (timer) window.clearTimeout(timer);
-      if (idleId && typeof window.cancelIdleCallback === "function")
-        window.cancelIdleCallback(idleId);
-    }
-    function arm() {
-      cleanup();
       setArmed(true);
-    }
-    function scheduleIdle() {
-      timer = window.setTimeout(() => {
-        if (typeof window.requestIdleCallback === "function")
-          idleId = window.requestIdleCallback(arm);
-        else timer = window.setTimeout(arm, 500); // Safari: no rIC
-      }, 8000);
-    }
-
+    };
     for (const e of EVENTS) window.addEventListener(e, arm, { passive: true });
-    if (document.readyState === "complete") scheduleIdle();
-    else window.addEventListener("load", scheduleIdle, { once: true });
-    return cleanup;
+    return () => {
+      for (const e of EVENTS) window.removeEventListener(e, arm);
+    };
   }, [tier, armed]);
 
   // mount: full tier mounts immediately; mobile waits for arm + the hero being

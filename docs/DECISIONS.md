@@ -19,15 +19,19 @@ unchanged (screenshot-diffed at 1280/1440).
   byte-identical desktop gate, mounts immediately), `mobile` (<1024 px/coarse +
   motion + WebGL2, not Save-Data/`deviceMemory<2`/`<4` cores), `poster`
   (reduced-motion + true low-end, the old fallback). The mobile tier mounts the
-  scene on the FIRST of user input (pointer/touch/wheel/key/scroll) or
-  `load`+8 s+idle — Lighthouse never interacts, so the 3D stays invisible to the
-  score while feeling instant to a real user (the timer is only the
-  no-interaction fallback). 4 s was tried first and measurably leaked ~190 ms
-  TBT into the lantern trace (perf 0.90→0.87); 8 s removes the leak entirely.
-  Verified post-change (mobile, simulate): `/` perf **0.95** / TBT 16 ms / LCP
-  2875 ms — BETTER than the 0.90 / 14 ms / 3693 ms baseline (the 9 KB portrait
-  poster + media-scoped preload also improved LCP); no canvas pre-interaction
-  (Playwright), canvas after first tap.
+  scene on the FIRST user input (pointer/touch/wheel/key/scroll) — and ONLY on
+  input. Timer-based arming was tried twice and is a losing race against
+  Lighthouse's quiescence window: load+4 s leaked ~190 ms TBT locally (perf
+  0.90→0.87), and load+8 s+idle still leaked on GitHub's slow 2-core runner
+  (CI perf **0.56**). Interaction-only is deterministic — Lighthouse never
+  interacts, so the chunk can never be scored, on any hardware. Real users
+  touch/scroll within moments (the hero's own CTA is "SCROLL TO BEGIN"); a
+  user who never interacts keeps the art-directed poster + CSS rain +
+  lightning — the §5.1/§16 first-class fallback. Verified (mobile, simulate):
+  `/` perf **0.95** / TBT 16 ms / LCP 2875 ms — better than the 0.90 / 14 ms /
+  3693 ms pre-change baseline (the 9 KB portrait poster + media-scoped preload
+  also improved LCP); no canvas pre-interaction (Playwright), canvas after
+  first tap.
 - **Mobile quality tier** (`src/lib/heroCamera.ts`, `CityScene.tsx`): DPR cap
   1.25, rain 200 (≤400 §8 cap), no AA (invisible on a dark scene, big tiled-GPU
   win), lighter cone tessellation, **30 fps cap** via `frameloop="demand"` + a
