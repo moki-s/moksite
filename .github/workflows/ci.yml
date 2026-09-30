@@ -73,6 +73,7 @@ jobs:
             # (the raw job log requires repo auth to download)
             AUDITS=$(node -e "
               const fs = require('fs');
+              let dumped = false;
               for (const f of fs.readdirSync('lhci-report')) {
                 if (!f.endsWith('.json')) continue;
                 try {
@@ -84,7 +85,18 @@ jobs:
                     'FCP', a('first-contentful-paint'), 'SI', a('speed-index'),
                     'LCP', a('largest-contentful-paint'), 'TBT', a('total-blocking-time'),
                     'CLS', r.audits['cumulative-layout-shift']?.numericValue,
-                    'LCPel', JSON.stringify(el.slice(0, 80)));
+                    'LCPel', JSON.stringify(el.slice(0, 60)));
+                  if ((r.audits['total-blocking-time']?.numericValue ?? 0) > 1000 && !dumped) {
+                    dumped = true;
+                    for (const t of (r.audits['long-tasks']?.details?.items ?? []).slice(0, 8))
+                      console.log('  task', Math.round(t.duration) + 'ms@' + Math.round(t.startTime),
+                        (t.url ?? '').replace(/.*\\/_next\\//, '').slice(0, 50));
+                    for (const b of (r.audits['bootup-time']?.details?.items ?? []).slice(0, 5))
+                      console.log('  boot', Math.round(b.total) + 'ms(script ' + Math.round(b.scripting) + ')',
+                        (b.url ?? '').replace(/.*\\/_next\\//, '').slice(0, 50));
+                    for (const g of (r.audits['mainthread-work-breakdown']?.details?.items ?? []))
+                      console.log('  cat', g.groupLabel, Math.round(g.duration) + 'ms');
+                  }
                 } catch {}
               }
             " 2>&1)
