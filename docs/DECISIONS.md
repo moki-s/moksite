@@ -164,6 +164,20 @@ unchanged (screenshot-diffed at 1280/1440).
   `keydown` — every physical gesture on a touch device (tap, swipe, scroll)
   begins with a touch, so no real visitor is lost, and no automation-emitted
   event can start the scene.
+  **Run #42 (TBT 475–520 remaining):** script parsing proved the three chunk
+  never loaded — the continuous ~80 ms frame-tasks were the always-on
+  animation layer, dominated by the **CSS rain animating `background-position`**
+  (non-compositable → full-screen main-thread repaint every frame; ~20 ms/frame
+  on software-rendered Chrome, a real cost on low-end phones too). Rewritten as
+  a `transform: translateY` loop on an oversized `::before` (the gradient tiles
+  every 220 px, so a 220 px translate loops seamlessly) — compositor-driven,
+  visually identical, zero main-thread per-frame work.
+  **LCP ~3.3 s (warn) root-caused as a measurement artifact:** the page is
+  visually complete at ~1.2 s; headless Chrome produces frames lazily, so the
+  h1's paint entry records at 1.5–2.6 s unthrottled (tween and font both ruled
+  out by experiment — even `/dossier`'s plain `<li>` records ~2.2–2.7 s) and
+  lantern amplifies it to ~3.3 s. Historic (Phase 7's "deliberately pessimistic
+  lab LCP" note) and warn-only; real-device LCP is governed by FCP ≈ 1.07 s.
 - **No new dependencies** (§7.2 check: everything uses existing
   gsap/lenis/r3f/three/zustand/playwright/sharp).
 

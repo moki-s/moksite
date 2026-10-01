@@ -909,27 +909,43 @@ html.no-motion .hero-caption {
 }
 
 /* §5.1 fallback — animated CSS rain on the poster when 3D can't run but motion
-   is on (reduced motion shows neither, via html.no-motion below) */
+   is on (reduced motion shows neither, via html.no-motion below).
+   Implementation note: the gradient lives on an oversized ::before that
+   animates TRANSFORM (compositor-driven), not background-position — animating
+   background-position repaints the full-screen gradient on the main thread
+   every frame (~20 ms/frame on software-rendered Chrome; it was the CI TBT
+   failure and a real cost on low-end phones). The gradient tiles every 220px,
+   so a 220px translate loops seamlessly — visually identical. */
 .hero-css-rain {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  overflow: hidden;
+  opacity: 0.5;
+}
+.hero-css-rain::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -220px;
+  bottom: 0;
   background-image: repeating-linear-gradient(
     14deg,
     transparent 0 9px,
     color-mix(in srgb, var(--rain) 22%, transparent) 9px 10px
   );
   background-size: 100% 220px;
-  opacity: 0.5;
   animation: hero-rain 0.7s linear infinite;
+  will-change: transform;
 }
 @keyframes hero-rain {
   to {
-    background-position: 0 220px;
+    transform: translateY(220px);
   }
 }
-html.no-motion .hero-css-rain {
+html.no-motion .hero-css-rain::before {
   animation: none;
 }
 
