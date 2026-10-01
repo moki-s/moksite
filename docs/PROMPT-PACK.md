@@ -1,5 +1,12 @@
 # moksite — Claude Code prompt pack
 
+> **HISTORICAL DOCUMENT — do not execute.** Every phase below (0–7) shipped,
+> and the Oct 2026 mobile overhaul then superseded parts of what they built
+> (notably Phase 4's hero gating: mobile now runs tiered 3D armed on human
+> input, not a poster-only fallback). Current working rules live in
+> `CLAUDE.md`; current reality and all deviations in `docs/DECISIONS.md`.
+> Kept only as a record of how the site was built.
+
 Companion to `docs/PRD.md`. Keep this in `docs/`. The standing rules (plan-first,
 Context7, no-fabrication, definition-of-done, stop-at-phase-boundary) live in `CLAUDE.md`,
 so the per-phase prompts below stay short and just say *what* to build.

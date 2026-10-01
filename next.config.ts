@@ -1,11 +1,12 @@
 import type { NextConfig } from "next";
 
-// GitHub Pages / static-host build:
+// LEGACY / UNUSED — GitHub Pages static-host escape hatch (kept for reference):
 //   STATIC_EXPORT=true NEXT_PUBLIC_BASE_PATH=/moksite pnpm build
-// emits a fully static site into ./out. basePath is required when the site is
-// served from a project subpath, e.g. https://<user>.github.io/<repo>/. Normal
-// (server) builds — local dev, CI, Vercel — leave STATIC_EXPORT unset and keep
-// the full Next server feature set, including the §7.6 security headers below.
+// emits a fully static site into ./out, but DELETES the /api/contact route and
+// degrades the form to mailto. Production is the Vercel SERVER deploy (git
+// integration on main) — see README "Deploy". Normal builds — local dev, CI,
+// Vercel — leave STATIC_EXPORT unset and keep the full Next server feature set,
+// including the §7.6 security headers below.
 const isStaticExport = process.env.STATIC_EXPORT === "true";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 

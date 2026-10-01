@@ -1,6 +1,16 @@
 # PRD — Project NIGHTFRAME (v2.1, build-ready)
 ## A noir comic-book portfolio with a hidden Command Center
 
+> **Build complete (all phases 0–7 shipped; live at https://moksite.vercel.app).**
+> This spec is preserved as written. Owner-approved deviations in
+> `docs/DECISIONS.md` (newest first) **supersede this document's literal text**
+> — most significantly the Oct 2026 mobile overhaul, which replaces §5.1's
+> poster-only mobile gating (mobile now runs tiered 3D, armed on human input),
+> extends §12's test matrix to four Playwright projects, updates §16's
+> "3D tanks mobile" mitigation, and documents the §2/§8 lab-LCP figure as a
+> warn-only headless-measurement artifact. Read that entry before relying on
+> those sections.
+
 **Status:** Approved for build · **Owner:** Mokshith Sanga · **Revision:** v2.1 — placeholders resolved from master CV (see Appendix A)
 **Concept:** Cinematic comic-scroll site ("The Dark Issue") + hidden lair terminal ("The Command Center").
 **This document is the single source of truth.** It is written to be executed end-to-end by an AI coding agent (Claude Code, Codex, or Antigravity) working phase by phase with a human in the loop.

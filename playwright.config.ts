@@ -1,7 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// Phase 2 verification (§12). Builds are run separately; this serves the
-// production build via `pnpm start` and reuses an already-running server.
+// Full-site e2e verification (§12 + the mobile overhaul, docs/DECISIONS.md).
+// Builds are run separately; this serves the production build via `pnpm start`
+// and reuses an already-running server.
 //
 // Mobile projects (§12, docs/DECISIONS.md 30 Sep 2026): real phone descriptors
 // (touch, mobile viewport, coarse pointer) scoped to the focused mobile spec
