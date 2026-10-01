@@ -156,6 +156,14 @@ unchanged (screenshot-diffed at 1280/1440).
   Cold home TBT 1516 → **59–96 ms**, cold perf 0.64 → **0.89–0.90** — equal
   to the pre-overhaul baseline (0.89–0.90 / 61–94 ms) under identical cold
   conditions. Real-device benefit: phones no longer pay GL init on page load.
+  **Final piece (run #40):** CI TBT stayed ~3.8 s after that fix; per-task
+  attribution showed ~140 ms tasks running continuously from 6–11 s with 7.4 s
+  total on a lazy chunk with ~0 script time — the 3D render loop in software
+  GL. The scene was ARMING during the Lighthouse run: a `scroll` event fires
+  with no user present. Arm triggers reduced to `pointerdown` / `touchstart` /
+  `keydown` — every physical gesture on a touch device (tap, swipe, scroll)
+  begins with a touch, so no real visitor is lost, and no automation-emitted
+  event can start the scene.
 - **No new dependencies** (§7.2 check: everything uses existing
   gsap/lenis/r3f/three/zustand/playwright/sharp).
 

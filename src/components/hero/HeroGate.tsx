@@ -126,7 +126,13 @@ export function HeroGate() {
   // fallback, not a degraded state.
   useEffect(() => {
     if (tier !== "mobile" || armed) return;
-    const EVENTS = ["pointerdown", "touchstart", "wheel", "keydown", "scroll"] as const;
+    // ONLY events that require a physical human: CI run #40 proved `scroll`
+    // fires during a Lighthouse run with no user present (the armed scene's
+    // software-GL frames then burned ~7s of traced main thread). On touch
+    // devices every real gesture — tap, swipe, scroll — begins with
+    // touchstart/pointerdown, and keydown covers keyboard users, so dropping
+    // scroll/wheel loses no real visitor.
+    const EVENTS = ["pointerdown", "touchstart", "keydown"] as const;
     const arm = () => {
       for (const e of EVENTS) window.removeEventListener(e, arm);
       setArmed(true);
