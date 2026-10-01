@@ -86,7 +86,10 @@ jobs:
                     'LCP', a('largest-contentful-paint'), 'TBT', a('total-blocking-time'),
                     'CLS', r.audits['cumulative-layout-shift']?.numericValue,
                     'LCPel', JSON.stringify(el.slice(0, 60)));
-                  if ((r.audits['total-blocking-time']?.numericValue ?? 0) > 1000 && !dumped) {
+                  const phases = r.audits['largest-contentful-paint-element']?.details?.items?.[1]?.items ?? [];
+                  if (phases.length)
+                    console.log('  lcp-phases', phases.map((p) => p.phase + '=' + Math.round(p.timing)).join(' '));
+                  if ((r.audits['total-blocking-time']?.numericValue ?? 0) > 400 && !dumped) {
                     dumped = true;
                     for (const t of (r.audits['long-tasks']?.details?.items ?? []).slice(0, 8))
                       console.log('  task', Math.round(t.duration) + 'ms@' + Math.round(t.startTime),
